@@ -174,11 +174,14 @@ syscall(void)
 
     int pid=p->pid;
     printf("%d: syscall %s (", pid, syscall_number_to_name[num]);
-    if(num==SYS_exit || num==SYS_wait || num==SYS_pipe || num==SYS_kill || num==)
+    if(num==SYS_exit || num==SYS_wait || num==SYS_pipe || num==SYS_kill)
       //one
+      printf("1");
     else if(num==SYS_exec)
+      printf("2");
       //two
     else if(num==SYS_read)
+      printf("3");
       //three
     //TODO this portion
 

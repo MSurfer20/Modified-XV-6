@@ -14,7 +14,7 @@ main(int argc, char** argv)
 
     if(pid<0)
     {
-        perror("Error forking");
+        // perror("Error forking");
         exit(1);
     }
     if(pid==0)
