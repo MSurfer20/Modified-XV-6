@@ -95,3 +95,16 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+uint64
+sys_trace(void)
+{
+  int trace_mask=0;
+
+  // Getting 0th argument to syscall trace as an int
+  if(argint(0, &trace_mask) < 0)
+    return -1;
+  
+  int return_val = trace(trace_mask);
+  return trace_mask;
+}
