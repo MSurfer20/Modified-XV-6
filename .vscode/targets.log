@@ -8,7 +8,7 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Thu Oct 21 23:08:32 2021
+# Make data base, printed on Fri Oct 22 00:41:47 2021
 
 # Variables
 
@@ -60,10 +60,10 @@ CFLAGS = -Wall -Werror -O -fno-omit-frame-pointer -ggdb -MD -mcmodel=medany -ffr
 JOURNAL_STREAM = 8:52180
 # environment
 XDG_CONFIG_DIRS = /etc/xdg/xdg-ubuntu:/etc/xdg
-# makefile (from 'Makefile', line 151)
+# makefile (from 'Makefile', line 152)
 GDBPORT = $(shell expr `id -u` % 5000 + 25000)
 # makefile (from 'user/grind.d', line 1)
-MAKEFILE_LIST :=  Makefile kernel/proc.d kernel/virtio_disk.d kernel/fs.d kernel/log.d kernel/syscall.d kernel/printf.d kernel/trap.d kernel/uart.d kernel/sysfile.d kernel/string.d kernel/sleeplock.d kernel/main.d kernel/console.d kernel/spinlock.d kernel/pipe.d kernel/file.d kernel/sysproc.d kernel/vm.d kernel/kalloc.d kernel/exec.d kernel/bio.d kernel/plic.d kernel/start.d user/wc.d user/ls.d user/ulib.d user/printf.d user/rm.d user/init.d user/usertests.d user/cat.d user/usys.d user/kill.d user/echo.d user/initcode.d user/stressfs.d user/sh.d user/mkdir.d user/umalloc.d user/grep.d user/zombie.d user/ln.d user/forktest.d user/grind.d
+MAKEFILE_LIST :=  Makefile kernel/proc.d kernel/virtio_disk.d kernel/fs.d kernel/log.d kernel/syscall.d kernel/printf.d kernel/trap.d kernel/uart.d kernel/sysfile.d kernel/string.d kernel/sleeplock.d kernel/main.d kernel/console.d kernel/spinlock.d kernel/pipe.d kernel/file.d kernel/sysproc.d kernel/vm.d kernel/kalloc.d kernel/exec.d kernel/bio.d kernel/plic.d kernel/start.d user/wc.d user/ls.d user/ulib.d user/printf.d user/rm.d user/init.d user/cat.d user/usys.d user/kill.d user/echo.d user/initcode.d user/stressfs.d user/sh.d user/mkdir.d user/umalloc.d user/grep.d user/zombie.d user/usertests.d user/ln.d user/forktest.d user/grind.d
 # automatic
 @F = $(notdir $@)
 # environment
@@ -104,9 +104,9 @@ LSCOLORS = Gxfxcxdxbxegedabagacad
 SESSION_MANAGER = local/suyash:@/tmp/.ICE-unix/2207,unix/suyash:/tmp/.ICE-unix/2207
 # environment
 XDG_RUNTIME_DIR = /run/user/1000
-# makefile (from 'Makefile', line 157)
+# makefile (from 'Makefile', line 158)
 CPUS := 3
-# makefile (from 'Makefile', line 153)
+# makefile (from 'Makefile', line 154)
 QEMUGDB = $(shell if $(QEMU) -help | grep -q '^-gdb'; then echo "-gdb tcp::$(GDBPORT)"; else echo "-s -p $(GDBPORT)"; fi)
 # environment
 XDG_MENU_PREFIX = gnome-
@@ -224,7 +224,7 @@ GDK_BACKEND = x11
 QT_ACCESSIBILITY = 1
 # environment
 DEFAULTS_PATH = /usr/share/gconf/ubuntu.default.path
-# makefile (from 'Makefile', line 162)
+# makefile (from 'Makefile', line 163)
 QEMUOPTS = -machine virt -bios none -kernel $K/kernel -m 128M -smp $(CPUS) -nographic -drive file=fs.img,if=none,format=raw,id=x0 -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
 # 'override' directive
 .SHELLSTATUS := 1
@@ -247,7 +247,7 @@ OBJCOPY = $(TOOLPREFIX)objcopy
 # default
 SUFFIXES := 
 # makefile (from 'Makefile', line 118)
-UPROGS = $U/_cat $U/_echo $U/_forktest $U/_grep $U/_init $U/_kill $U/_ln $U/_ls $U/_mkdir $U/_rm $U/_sh $U/_stressfs $U/_usertests $U/_grind $U/_wc $U/_zombie $U/_strace
+UPROGS = $U/_cat $U/_echo $U/_forktest $U/_grep $U/_init $U/_kill $U/_ln $U/_ls $U/_mkdir $U/_rm $U/_sh $U/_stressfs $U/_usertests $U/_strace $U/_grind $U/_wc $U/_zombie $U/_strace
 # environment
 CHROME_DESKTOP = code-url-handler.desktop
 # environment
@@ -258,6 +258,7 @@ PYENV_VIRTUALENV_INIT = 1
 .INCLUDE_DIRS = /usr/include /usr/local/include /usr/include
 # environment
 GJS_DEBUG_OUTPUT = stderr
+ 
 # default
 .RECIPEPREFIX := 
 # environment
@@ -265,8 +266,7 @@ LANG = C
 # environment
 VSCODE_PID = 5735
 # variable set hash-table stats:
- 
-# Load=126/1024=12%, Rehash=0, Collisions=25/371=7%
+# Load=126/1024=12%, Rehash=0, Collisions=25/372=7%
 
 # Pattern-specific Variable Values
 
@@ -274,11 +274,11 @@ VSCODE_PID = 5735
 
 # Directories
 
-# user (device 2050, inode 30150959): 117 files, no impossibilities.
+# user (device 2050, inode 30150959): 118 files, no impossibilities.
 # kernel (device 2050, inode 30150899): 101 files, no impossibilities.
 # . (device 2050, inode 29623223): 16 files, no impossibilities.
 
-# 234 files, no impossibilities in 3 directories.
+# 235 files, no impossibilities in 3 directories.
 
 # Implicit Rules
 
@@ -329,7 +329,7 @@ qemu: kernel/kernel fs.img
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 165):
+#  recipe to execute (from 'Makefile', line 166):
 	$(QEMU) $(QEMUOPTS)
 
 # Not a target:
@@ -471,11 +471,11 @@ kernel/log.o: kernel/log.c kernel/types.h kernel/riscv.h kernel/defs.h kernel/pa
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
- 
 
 # Not a target:
 user/wc.c:
 #  Implicit rule search has not been done.
+ 
 #  Modification time never checked.
 #  File has not been updated.
 
@@ -621,7 +621,6 @@ user/_forktest: user/forktest.o user/ulib.o user/usys.o user/printf.o user/umall
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
- 
 #  recipe to execute (from 'Makefile', line 104):
 	# forktest has less library code linked in - needs to be small
 	# in order to be able to max out the proc table.
@@ -638,7 +637,7 @@ kernel/plic.d:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2021-10-21 14:08:28.76950806
+#  Last modified 2021-10-22 00:41:45.117403285
 #  File has been updated.
 #  Successfully updated.
 
@@ -669,6 +668,7 @@ user/echo.o: user/echo.c kernel/types.h kernel/stat.h user/user.h
 # Not a target:
 user/umalloc.d:
 #  Implicit rule search has been done.
+ 
 #  Last modified 2021-10-21 11:49:47.910529274
 #  File has been updated.
 #  Successfully updated.
@@ -747,7 +747,6 @@ user/_rm:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
- 
 
 # Not a target:
 mkfs/mkfs.c:
@@ -853,7 +852,7 @@ user/init.c:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 168):
+#  recipe to execute (from 'Makefile', line 169):
 	sed "s/:1234/:$(GDBPORT)/" < $^ > $@
 
 # Not a target:
@@ -897,17 +896,17 @@ user/_echo:
 #  Modification time never checked.
 #  File has not been updated.
 
-fs.img: mkfs/mkfs README user/_cat user/_echo user/_forktest user/_grep user/_init user/_kill user/_ln user/_ls user/_mkdir user/_rm user/_sh user/_stressfs user/_usertests user/_grind user/_wc user/_zombie user/_strace
+fs.img: mkfs/mkfs README user/_cat user/_echo user/_forktest user/_grep user/_init user/_kill user/_ln user/_ls user/_mkdir user/_rm user/_sh user/_stressfs user/_usertests user/_strace user/_grind user/_wc user/_zombie user/_strace
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
- 
-#  recipe to execute (from 'Makefile', line 138):
+#  recipe to execute (from 'Makefile', line 139):
 	mkfs/mkfs fs.img README $(UPROGS)
 
 # Not a target:
 user/wc.d:
 #  Implicit rule search has been done.
+ 
 #  Last modified 2021-10-21 11:49:49.586655776
 #  File has been updated.
 #  Successfully updated.
@@ -1034,7 +1033,6 @@ kernel/pipe.d:
 kernel/sleeplock.h:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
- 
 #  File has not been updated.
 
 # Not a target:
@@ -1059,9 +1057,10 @@ qemu-gdb: kernel/kernel .gdbinit fs.img
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 171):
+#  recipe to execute (from 'Makefile', line 172):
 	@echo "*** Now run 'gdb' in another window." 1>&2
 	$(QEMU) $(QEMUOPTS) -S $(QEMUGDB)
+ 
 
 kernel/sysfile.o: kernel/sysfile.c kernel/types.h kernel/riscv.h kernel/defs.h kernel/param.h kernel/stat.h kernel/spinlock.h kernel/proc.h kernel/fs.h kernel/sleeplock.h kernel/file.h kernel/fcntl.h
 #  Implicit rule search has not been done.
@@ -1072,7 +1071,7 @@ clean:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 143):
+#  recipe to execute (from 'Makefile', line 144):
 	rm -f *.tex *.dvi *.idx *.aux *.log *.ind *.ilg \
 	*/*.o */*.d */*.asm */*.sym \
 	$U/initcode $U/initcode.out $K/kernel fs.img \
@@ -1200,7 +1199,6 @@ kernel/trap.o: kernel/trap.c kernel/types.h kernel/param.h kernel/memlayout.h ke
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
- 
 
 # Not a target:
 user/cat.d:
@@ -1225,6 +1223,7 @@ user/_wc:
 # Not a target:
 kernel/sysproc.d:
 #  Implicit rule search has been done.
+ 
 #  Last modified 2021-10-21 11:49:46.494422533
 #  File has been updated.
 #  Successfully updated.
@@ -1327,7 +1326,6 @@ kernel/riscv.h:
 
 # Not a target:
 user/user.h:
- 
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
@@ -1362,6 +1360,7 @@ kernel/syscall.d:
 #  Successfully updated.
 
 # Not a target:
+ 
 user/rm.d:
 #  Implicit rule search has been done.
 #  Last modified 2021-10-21 11:49:48.594580884
@@ -1476,25 +1475,25 @@ kernel/main.o: kernel/main.c kernel/types.h kernel/param.h kernel/memlayout.h ke
 
 # Not a target:
 kernel/string.c:
- 
 #  Implicit rule search has not been done.
 #  Modification time never checked.
+ 
 #  File has not been updated.
 
 # files hash-table stats:
-# Load=193/1024=19%, Rehash=0, Collisions=54/674=8%
+# Load=193/1024=19%, Rehash=0, Collisions=54/675=8%
 # VPATH Search Paths
 
 # No 'vpath' search paths.
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 417 / storage = 4492 B / avg = 10 B
-# current buf: size = 8162 B / used = 4492 B / count = 417 / avg = 10 B
+# strcache buffers: 1 (0) / strings = 418 / storage = 4501 B / avg = 10 B
+# current buf: size = 8162 B / used = 4501 B / count = 418 / avg = 10 B
 
-# strcache performance: lookups = 851 / hit rate = 50%
+# strcache performance: lookups = 853 / hit rate = 50%
 # hash-table stats:
-# Load=417/8192=5%, Rehash=0, Collisions=46/851=5%
-# Finished Make data base on Thu Oct 21 23:08:32 2021
+# Load=418/8192=5%, Rehash=0, Collisions=46/853=5%
+# Finished Make data base on Fri Oct 22 00:41:47 2021
 
  
