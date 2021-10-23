@@ -1,6 +1,10 @@
 K=kernel
 U=user
 
+ifndef SCHEDULER
+	SCHEDULER := RNDRBN
+endif
+
 OBJS = \
   $K/entry.o \
   $K/start.o \
@@ -70,6 +74,22 @@ endif
 ifneq ($(shell $(CC) -dumpspecs 2>/dev/null | grep -e '[^f]nopie'),)
 CFLAGS += -fno-pie -nopie
 endif
+
+ifeq ($(SCHEDULER), RNDRBN)
+	CLFAGS += -DSCHEDULER=0
+endif
+ifeq ($(SCHEDULER), FCFS)
+	CLFAGS += -DSCHEDULER=1
+endif
+ifeq ($(SCHEDULER), PBS)
+	CLFAGS += -DSCHEDULER=2
+endif
+ifeq ($(SCHEDULER), MLFQ)
+	CLFAGS += -DSCHEDULER=3
+endif
+
+flags:
+	@echo $(SCHEDULER)
 
 LDFLAGS = -z max-page-size=4096
 

@@ -6,6 +6,10 @@
 #include "proc.h"
 #include "defs.h"
 
+#ifndef SCHEDULER
+#define SCHEDULER 0
+#endif
+
 struct cpu cpus[NCPU];
 
 struct proc proc[NPROC];
@@ -120,6 +124,7 @@ found:
   p->pid = allocpid();
   p->state = USED;
   p->trace_mask = 0;
+  p->ctime=ticks;
 
   // Allocate a trapframe page.
   if((p->trapframe = (struct trapframe *)kalloc()) == 0){
@@ -166,6 +171,7 @@ freeproc(struct proc *p)
   p->xstate = 0;
   p->state = UNUSED;
   p->trace_mask=0;
+  p->ctime=0;
 }
 
 // Create a user page table for a given process,
@@ -441,6 +447,7 @@ wait(uint64 addr)
 void
 scheduler(void)
 {
+  #if SCHEDULER == 0
   struct proc *p;
   struct cpu *c = mycpu();
   
@@ -466,6 +473,52 @@ scheduler(void)
       release(&p->lock);
     }
   }
+  #endif
+
+  #if SCHEDULER == 1
+  struct proc *p;
+  struct cpu *c = mycpu();
+  
+  c->proc = 0;
+  for(;;){
+    // Avoid deadlock by ensuring that devices can interrupt.
+    intr_on();
+    struct proc lowest_time_proc = 0;
+    for(p = proc; p < &proc[NPROC]; p++) {
+      acquire(&p->lock);
+      if(p->state == RUNNABLE) {
+        if(lowest_time_proc==0)
+        lowest_time_proc=p;
+        else if(p->ctime < lowest_time_proc->ctime)
+        lowest_time_proc=p;
+        // Switch to chosen process.  It is the process's job
+        // to release its lock and then reacquire it
+        // before jumping back to us.
+
+        // Process is done running for now.
+        // It should have changed its p->state before coming back.
+      }
+      release(&p->lock);
+    }
+    if(lowest_time_proc==0)
+    continue;
+    acquire(&lowest_time_proc->lock);
+      if(lowest_time_proc->state == RUNNABLE) {
+        // Switch to chosen process.  It is the process's job
+        // to release its lock and then reacquire it
+        // before jumping back to us.
+        lowest_time_proc->state = RUNNING;
+        c->proc = lowest_time_proc;
+        swtch(&c->context, &lowest_time_proc->context);
+
+        // Process is done running for now.
+        // It should have changed its p->state before coming back.
+        c->proc = 0;
+      }
+      release(&lowest_time_proc->lock);
+  }
+  #endif
+
 }
 
 // Switch to scheduler.  Must hold only p->lock
