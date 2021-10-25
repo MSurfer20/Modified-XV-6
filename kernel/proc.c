@@ -576,12 +576,13 @@ scheduler(void)
     continue;
     acquire(&lowest_time_proc->lock);
       if(lowest_time_proc->state == RUNNABLE) {
-        printf("RUNNING PROC %d\n", (int)lowest_time_proc->pid);
+        // printf("RUNNING PROC %d\n", (int)lowest_time_proc->pid);
         // Switch to chosen process.  It is the process's job
         // to release its lock and then reacquire it
         // before jumping back to us.
         lowest_time_proc->state = RUNNING;
         c->proc = lowest_time_proc;
+        printf("PID: %d CPU: %d START TIME: %d\n", p->pid, cpuid(), p->ctime);
         swtch(&c->context, &lowest_time_proc->context);
 
         // Process is done running for now.

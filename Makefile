@@ -154,6 +154,7 @@ UPROGS=\
 	$U/_zombie\
 	$U/_strace\
 	$U/_setpriority\
+	$U/_schedulertest\
 	$U/_time\
 
 fs.img: mkfs/mkfs README $(UPROGS)
