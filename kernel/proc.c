@@ -7,7 +7,7 @@
 #include "defs.h"
 
 #ifndef SCHEDULER
-#define SCHEDULER 0
+#define SCHEDULER 1
 #endif
 
 struct cpu cpus[NCPU];
@@ -483,7 +483,7 @@ scheduler(void)
   for(;;){
     // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
-    struct proc lowest_time_proc = 0;
+    struct proc* lowest_time_proc = 0;
     for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
       if(p->state == RUNNABLE) {
@@ -504,6 +504,7 @@ scheduler(void)
     continue;
     acquire(&lowest_time_proc->lock);
       if(lowest_time_proc->state == RUNNABLE) {
+        printf("RUNNING PROC %d\n", (int)lowest_time_proc->pid);
         // Switch to chosen process.  It is the process's job
         // to release its lock and then reacquire it
         // before jumping back to us.
