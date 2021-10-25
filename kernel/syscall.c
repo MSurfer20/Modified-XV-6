@@ -129,6 +129,7 @@ static uint64 (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 [SYS_trace]   sys_trace,
+[SYS_setpriority] sys_setpriority,
 };
 
 char* syscall_number_to_name[] = {
@@ -154,6 +155,7 @@ char* syscall_number_to_name[] = {
 [SYS_mkdir]   "mkdir",
 [SYS_close]   "close",
 [SYS_trace]   "trace",
+[SYS_setpriority] "setpriority",
 };
 
 void

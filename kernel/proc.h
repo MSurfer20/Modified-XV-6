@@ -108,4 +108,6 @@ struct proc {
   int ctime;
 
   int trace_mask;
+  int static_priority;
+  int niceness;
 };

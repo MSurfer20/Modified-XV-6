@@ -125,6 +125,8 @@ found:
   p->state = USED;
   p->trace_mask = 0;
   p->ctime=ticks;
+  p->niceness=5;
+  p->static_priority=60;
 
   // Allocate a trapframe page.
   if((p->trapframe = (struct trapframe *)kalloc()) == 0){
@@ -172,6 +174,8 @@ freeproc(struct proc *p)
   p->state = UNUSED;
   p->trace_mask=0;
   p->ctime=0;
+  p->niceness=0;
+  p->static_priority=0;
 }
 
 // Create a user page table for a given process,
@@ -720,4 +724,22 @@ trace(int trace_mask)
   pr=myproc();
   pr->trace_mask=trace_mask;
   return 0;
+}
+
+int
+setpriority(int static_priority, int pid)
+{
+  struct proc *p;
+
+  for(p = proc; p < &proc[NPROC]; p++){
+    acquire(&p->lock);
+    if(p->pid == pid){
+        p->static_priority=static_priority;
+        p->niceness=5;
+      release(&p->lock);
+      return 0;
+    }
+    release(&p->lock);
+  }
+  return -1;
 }

@@ -110,3 +110,21 @@ sys_trace(void)
   return -1;
   return trace_mask;
 }
+
+uint64
+sys_setpriority(void)
+{
+  int static_priority=60;
+  int pid=0;
+
+  if(argint(0, &static_priority) < 0)
+    return -1;
+  if(static_priority<0 || static_priority>100)
+    return -1;
+  if(argint(1, &pid) < 0)
+    return -1;
+  int return_val=setpriority(static_priority, pid);
+  if(return_val<0)
+  return -1;
+  return static_priority;
+}
