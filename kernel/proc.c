@@ -712,7 +712,7 @@ procdump(void)
       state = states[p->state];
     else
       state = "???";
-    printf("%d %s %s", p->pid, state, p->name);
+    printf("%d %s %s %d %d", p->pid, state, p->name, p->niceness, p->static_priority);
     printf("\n");
   }
 }

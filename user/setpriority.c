@@ -5,8 +5,6 @@
 int
 main(int argc, char *argv[])
 {
-  int i;
-
   if(argc < 3){
     fprintf(2, "Usage: setpriority priority pid\n");
     exit(1);
