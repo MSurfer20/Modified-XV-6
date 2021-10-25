@@ -6,9 +6,6 @@
 #include "proc.h"
 #include "defs.h"
 
-#ifndef SCHEDULER
-#define SCHEDULER 1
-#endif
 
 struct cpu cpus[NCPU];
 
@@ -519,6 +516,18 @@ update_time()
 void
 scheduler(void)
 {
+  #if SCHEDULER == 0
+  printf("ROUND ROBIN\n");
+  #endif
+  #if SCHEDULER == 1
+  printf("FCFS\n");
+  #endif
+  #if SCHEDULER == 2
+  printf("PBS\n");
+  #endif
+  #if SCHEDULER == 3
+  printf("MLFQ\n");
+  #endif
   #if SCHEDULER == 0
   struct proc *p;
   struct cpu *c = mycpu();

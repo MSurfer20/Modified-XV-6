@@ -1,7 +1,7 @@
 K=kernel
 U=user
 
-
+# CPU Scheduler
 ifndef SCHEDULER
   SCHEDULER := RNDRBN
 endif
@@ -89,8 +89,10 @@ ifeq ($(SCHEDULER), MLFQ)
 	CFLAGS += -DSCHEDULER=3
 endif
 
-
 LDFLAGS = -z max-page-size=4096
+
+flags:
+	@echo $(SCHEDULER)
 
 $K/kernel: $(OBJS) $K/kernel.ld $U/initcode
 	$(LD) $(LDFLAGS) -T $K/kernel.ld -o $K/kernel $(OBJS)
@@ -146,15 +148,13 @@ UPROGS=\
 	$U/_mkdir\
 	$U/_rm\
 	$U/_sh\
+	$U/_strace\
 	$U/_stressfs\
 	$U/_usertests\
 	$U/_grind\
 	$U/_wc\
 	$U/_zombie\
-	$U/_strace\
-	$U/_setpriority\
-	$U/_schedulertest\
-	$U/_time\
+	$U/_setpriority
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
