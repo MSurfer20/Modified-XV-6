@@ -105,7 +105,7 @@ extern uint64 sys_wait(void);
 extern uint64 sys_write(void);
 extern uint64 sys_uptime(void);
 extern uint64 sys_trace(void);
-extern uint64 sys_setpriority(void);
+extern uint64 sys_set_priority(void);
 extern uint64 sys_waitx(void);
 
 static uint64 (*syscalls[])(void) = {
@@ -131,7 +131,7 @@ static uint64 (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 [SYS_trace]   sys_trace,
-[SYS_setpriority] sys_setpriority,
+[SYS_set_priority] sys_set_priority,
 [SYS_waitx]   sys_waitx,
 };
 
@@ -158,7 +158,7 @@ char* syscall_number_to_name[] = {
 [SYS_mkdir]   "mkdir",
 [SYS_close]   "close",
 [SYS_trace]   "trace",
-[SYS_setpriority] "setpriority",
+[SYS_set_priority] "set_priority",
 };
 
 void
@@ -168,13 +168,13 @@ syscall(void)
   struct proc *p = myproc();
 
   num = p->trapframe->a7;
-  if(num==SYS_trace)
-    printf("YAY");
-  printf("%d %d %d\n", num, NELEM(syscalls), syscalls[num]);
+  // if(num==SYS_trace)
+  //   printf("YAY");
+  // printf("%d %d %d\n", num, NELEM(syscalls), syscalls[num]);
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
     
-    if(num==SYS_trace)
-      printf("YAY");
+    // if(num==SYS_trace)
+    //   printf("YAY");
     
     int trace_mask=p->trace_mask;
     int temp=(1<<num) & (trace_mask);
@@ -182,8 +182,8 @@ syscall(void)
       temp=0;
     if(temp)
     {
-      if(num==SYS_trace)
-      printf("YAY");
+      // if(num==SYS_trace)
+      // printf("YAY");
       int pid=p->pid;
       printf("%d: syscall %s (", pid, syscall_number_to_name[num]);
       if(num==SYS_getpid || num==SYS_fork || num==SYS_uptime)
@@ -196,7 +196,7 @@ syscall(void)
         argint(0,&arg1);
         printf("%d)", arg1);
       }
-      else if(num==SYS_exec || num==SYS_fstat || num==SYS_link || num==SYS_open || num==SYS_setpriority)
+      else if(num==SYS_exec || num==SYS_fstat || num==SYS_link || num==SYS_open || num==SYS_set_priority)
       {
       int arg1,arg2;
       argint(0,&arg1);

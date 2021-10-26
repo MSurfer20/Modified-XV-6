@@ -145,7 +145,7 @@ sys_trace(void)
 }
 
 uint64
-sys_setpriority(void)
+sys_set_priority(void)
 {
   int static_priority=60;
   int pid=0;
@@ -156,7 +156,7 @@ sys_setpriority(void)
     return -1;
   if(argint(1, &pid) < 0)
     return -1;
-  int return_val=setpriority(static_priority, pid);
+  int return_val=set_priority(static_priority, pid);
   if(return_val<0)
   return -1;
   return static_priority;

@@ -637,7 +637,7 @@ scheduler(void)
         // before jumping back to us.
         lowest_time_proc->state = RUNNING;
         c->proc = lowest_time_proc;
-        printf("PID: %d CPU: %d START TIME: %d\n", lowest_time_proc->pid, cpuid(), lowest_time_proc->ctime);
+        // printf("PID: %d CPU: %d START TIME: %d\n", lowest_time_proc->pid, cpuid(), lowest_time_proc->ctime);
         swtch(&c->context, &lowest_time_proc->context);
 
         // Process is done running for now.
@@ -844,7 +844,7 @@ sched(void)
   #if SCHEDULER==3
     mlfq_queue[p->curr_queue].arr[mlfq_queue[p->curr_queue].num_procs]=p;
     mlfq_queue[p->curr_queue].num_procs++;
-  #endif
+  #endif  
   intena = mycpu()->intena;
   swtch(&p->context, &mycpu()->context);
   mycpu()->intena = intena;
@@ -1031,17 +1031,19 @@ trace(int trace_mask)
 }
 
 int
-setpriority(int static_priority, int pid)
+set_priority(int static_priority, int pid)
 {
   struct proc *p;
+  int old_priority=-1;
 
   for(p = proc; p < &proc[NPROC]; p++){
     acquire(&p->lock);
     if(p->pid == pid){
-        p->static_priority=static_priority;
-        p->niceness=5;
+      old_priority=p->static_priority;
+      p->static_priority=static_priority;
+      p->niceness=5;
       release(&p->lock);
-      return 0;
+      return old_priority;
     }
     release(&p->lock);
   }

@@ -29,7 +29,7 @@ int main() {
           exit(0);
       } else {
 #if SCHEDULER==2
-        setpriority(80, pid); // Will only matter for PBS, set lower priority for IO bound processes 
+        set_priority(80, pid); // Will only matter for PBS, set lower priority for IO bound processes 
 #endif
       }
   }

@@ -12,6 +12,6 @@ main(int argc, char *argv[])
   int priority, pid;
   priority=atoi(argv[1]);
   pid=atoi(argv[2]);
-  setpriority(priority, pid);
+  set_priority(priority, pid);
   exit(0);
 }
