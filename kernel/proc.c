@@ -52,6 +52,12 @@ procinit(void)
 {
   struct proc *p;
   
+  #if SCHEDULER==3
+  int i;
+  for(i=0;i<NUM_OF_QUEUES;i++)
+    mlfq_queue[i].arr[0]=0,mlfq_queue[i].num_procs=0;
+  #endif
+  
   initlock(&pid_lock, "nextpid");
   initlock(&wait_lock, "wait_lock");
   for(p = proc; p < &proc[NPROC]; p++) {
@@ -59,7 +65,6 @@ procinit(void)
       p->kstack = KSTACK((int) (p - proc));
   }
 
-  //TODO: Initialize the queue information here.
 }
 
 // Must be called with interrupts disabled,
@@ -120,6 +125,13 @@ allocproc(void)
       release(&p->lock);
     }
   }
+
+  #if SCHEDULER==3
+    int curr_index=mlfq_queue[0].num_procs;
+    mlfq_queue[0].arr[curr_index]=p;
+    mlfq_queue[0].num_procs++;
+  #endif
+
   return 0;
 
 found:
@@ -133,7 +145,7 @@ found:
   p->niceness=5;
   p->scheduled_count=0;
   p->static_priority=60;
-  //TODO:Push the process into 0th queue
+  p->curr_queue=0;
 
   // Allocate a trapframe page.
   if((p->trapframe = (struct trapframe *)kalloc()) == 0){
@@ -264,7 +276,6 @@ userinit(void)
 
   p->state = RUNNABLE;
 
-  //TODO:Insert this process into the 0th queue
 
   release(&p->lock);
 }

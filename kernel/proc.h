@@ -115,4 +115,20 @@ struct proc {
   int static_priority;
   int niceness;
   int scheduled_count;
+  int curr_queue;
+  int time_spent_queues[5];
+  uint age;
 };
+
+#define MAX_QUEUE_SIZE 100
+#define NUM_OF_QUEUES 5
+#define OLD_AGE 25
+
+
+struct MLFQ_Queue
+{
+  struct proc* arr[MAX_QUEUE_SIZE];
+  int num_procs;
+};
+
+struct MLFQ_Queue mlfq_queue[NUM_OF_QUEUES];
