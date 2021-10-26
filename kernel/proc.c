@@ -6,6 +6,9 @@
 #include "proc.h"
 #include "defs.h"
 
+#ifndef SCHEDULER
+#define SCHEDULER 2
+#endif
 
 struct cpu cpus[NCPU];
 
@@ -55,6 +58,8 @@ procinit(void)
       initlock(&p->lock, "proc");
       p->kstack = KSTACK((int) (p - proc));
   }
+
+  //TODO: Initialize the queue information here.
 }
 
 // Must be called with interrupts disabled,
@@ -123,9 +128,12 @@ found:
   p->trace_mask = 0;
   p->ctime=ticks;
   p->rtime=0;
+  p->stime=0;
   p->etime=0;
   p->niceness=5;
+  p->scheduled_count=0;
   p->static_priority=60;
+  //TODO:Push the process into 0th queue
 
   // Allocate a trapframe page.
   if((p->trapframe = (struct trapframe *)kalloc()) == 0){
@@ -174,6 +182,7 @@ freeproc(struct proc *p)
   p->trace_mask=0;
   p->ctime=0;
   p->niceness=0;
+  p->scheduled_count=0;
   p->static_priority=0;
 }
 
@@ -255,6 +264,8 @@ userinit(void)
 
   p->state = RUNNABLE;
 
+  //TODO:Insert this process into the 0th queue
+
   release(&p->lock);
 }
 
@@ -326,6 +337,7 @@ fork(void)
 
   acquire(&np->lock);
   np->state = RUNNABLE;
+  //TODO: Insert the process into the 0th queue
   release(&np->lock);
 
   return pid;
@@ -502,6 +514,11 @@ update_time()
     if (p->state == RUNNING) {
       p->rtime++;
     }
+    else if(p->state == SLEEPING)
+    {
+      p->stime++;
+    }
+    //TODO: Update the number of ticks spent in this queue
     release(&p->lock); 
   }
 }
@@ -591,7 +608,7 @@ scheduler(void)
         // before jumping back to us.
         lowest_time_proc->state = RUNNING;
         c->proc = lowest_time_proc;
-        printf("PID: %d CPU: %d START TIME: %d\n", p->pid, cpuid(), p->ctime);
+        printf("PID: %d CPU: %d START TIME: %d\n", lowest_time_proc->pid, cpuid(), lowest_time_proc->ctime);
         swtch(&c->context, &lowest_time_proc->context);
 
         // Process is done running for now.
@@ -599,6 +616,116 @@ scheduler(void)
         c->proc = 0;
       }
       release(&lowest_time_proc->lock);
+  }
+  #endif
+
+  #if SCHEDULER==2
+  struct proc *p;
+  struct cpu *c = mycpu();
+  
+  c->proc = 0;
+  for(;;){
+    // Avoid deadlock by ensuring that devices can interrupt.
+    intr_on();
+    struct proc* highest_priority_proc = 0;
+    int highest_priority=1100, highest_priority_scheduled_count=0;
+    uint highest_priority_ctime=0;
+    for(p = proc; p < &proc[NPROC]; p++) {
+      acquire(&p->lock);
+      if(p->state == RUNNABLE) {
+        int static_priority=p->static_priority;
+        int niceness=p->niceness;
+        int priority=static_priority-niceness+5;
+        if(priority<0)
+          priority=0;
+        else if(priority>100)
+          priority=100;
+        if(highest_priority_proc==0)
+        {
+          highest_priority_proc=p;
+          highest_priority=priority;
+          highest_priority_scheduled_count=p->scheduled_count;
+          highest_priority_ctime=p->ctime;
+        }
+        else if(priority<highest_priority)
+        {
+          release(&highest_priority_proc->lock);
+          highest_priority_proc=p;
+          highest_priority=priority;
+          highest_priority_scheduled_count=p->scheduled_count;
+          highest_priority_ctime=p->ctime;
+        }
+        else if(priority==highest_priority)
+        {
+          if(p->scheduled_count>highest_priority_scheduled_count)
+          {
+            release(&highest_priority_proc->lock);
+            highest_priority_proc=p;
+            highest_priority=priority;
+            highest_priority_scheduled_count=p->scheduled_count;
+            highest_priority_ctime=p->ctime;
+          }
+          else if(p->scheduled_count==highest_priority_scheduled_count && p->ctime<highest_priority_ctime)
+          {
+            release(&highest_priority_proc->lock);
+            highest_priority_proc=p;
+            highest_priority=priority;
+            highest_priority_scheduled_count=p->scheduled_count;
+            highest_priority_ctime=p->ctime;
+          }
+          else
+            release(&p->lock);
+        }
+        else release(&p->lock);
+        // Switch to chosen process.  It is the process's job
+        // to release its lock and then reacquire it
+        // before jumping back to us.
+
+        // Process is done running for now.
+        // It should have changed its p->state before coming back.
+      }
+      else
+        release(&p->lock);
+    }
+    if(highest_priority_proc==0)
+      continue;
+    // acquire(&highest_priority_proc->lock);
+    if(highest_priority_proc->state == RUNNABLE) 
+    {
+
+      // printf("RUNNING PROC %d\n", (int)lowest_time_proc->pid);
+      // Switch to chosen process.  It is the process's job
+      // to release its lock and then reacquire it
+      // before jumping back to us.
+      // printf("%d %d\n", highest_priority, (int)highest_priority_proc->pid);
+      // printf("YASSSSSSSSs");
+      // printf("%d\n", highest_priority_proc->state);
+      highest_priority_proc->state = RUNNING;
+      c->proc = highest_priority_proc;
+      swtch(&c->context, &highest_priority_proc->context);
+      // printf("PID: %d CPU: %d START TIME: %d\n", highest_priority_proc->pid, cpuid(), highest_priority_proc->ctime);
+      // printf("%d\n", highest_priority_proc->state);
+
+      // Process is done running for now.
+      // It should have changed its p->state before coming back.
+      c->proc = 0;
+      highest_priority_proc->scheduled_count+=1;
+      // printf("%d %d\n", highest_priority_proc->stime, highest_priority_proc->rtime);
+      if((highest_priority_proc->stime)+(highest_priority_proc->rtime) > 0)
+      {
+        int sum_of_val=(highest_priority_proc->stime)+(highest_priority_proc->rtime);
+        int sleep_time=highest_priority_proc->stime;
+        sleep_time=10*sleep_time;
+        if(sum_of_val != 0)
+        {
+          int new_niceness;
+          new_niceness = (sleep_time)/(sum_of_val);
+          highest_priority_proc->niceness=new_niceness;
+        }
+        printf("NEW NICENESS: %d\n", highest_priority_proc->niceness);
+      }
+    }
+    release(&highest_priority_proc->lock);
   }
   #endif
 
@@ -626,6 +753,7 @@ sched(void)
   if(intr_get())
     panic("sched interruptible");
 
+  //TODO: Insert into current queue
   intena = mycpu()->intena;
   swtch(&p->context, &mycpu()->context);
   mycpu()->intena = intena;
