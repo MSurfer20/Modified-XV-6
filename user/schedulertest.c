@@ -6,7 +6,6 @@
 
 #define NFORK 10
 #define IO 5
-#define FCFS
 
 int main() {
   int n, pid;
@@ -17,10 +16,22 @@ int main() {
       if (pid < 0)
           break;
       if (pid == 0) {
+#if SCHEDULER!=1
+          if (n < IO) {
+            sleep(200); // IO bound processes
+          } else {
+#endif
             for (volatile int i = 0; i < 1000000000; i++) {} // CPU bound process 
+#if SCHEDULER!=1
+          }
+#endif
           printf("Process %d finished", n);
           exit(0);
-      } 
+      } else {
+#if SCHEDULER==2
+        setpriority(80, pid); // Will only matter for PBS, set lower priority for IO bound processes 
+#endif
+      }
   }
   for(;n > 0; n--) {
       if(waitx(0,&wtime,&rtime) >= 0) {

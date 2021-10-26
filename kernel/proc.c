@@ -6,9 +6,9 @@
 #include "proc.h"
 #include "defs.h"
 
-// #ifndef SCHEDULER
+#ifndef SCHEDULER
 #define SCHEDULER 3
-// #endif
+#endif
 
 struct MLFQ_Queue mlfq_queue[NUM_OF_QUEUES];
 
@@ -128,12 +128,6 @@ allocproc(void)
     }
   }
 
-  #if SCHEDULER==3
-    int curr_index=mlfq_queue[0].num_procs;
-    mlfq_queue[0].arr[curr_index]=p;
-    mlfq_queue[0].num_procs++;
-  #endif
-
   return 0;
 
 found:
@@ -148,6 +142,11 @@ found:
   p->scheduled_count=0;
   p->static_priority=60;
   p->curr_queue=0;
+  #if SCHEDULER==3
+    int curr_index=mlfq_queue[0].num_procs;
+    mlfq_queue[0].arr[curr_index]=p;
+    mlfq_queue[0].num_procs++;
+  #endif
 
   // Allocate a trapframe page.
   if((p->trapframe = (struct trapframe *)kalloc()) == 0){
@@ -760,22 +759,22 @@ scheduler(void)
   #endif
 
   #if SCHEDULER==3
-  struct proc *p;
   struct cpu *c = mycpu();
   
   c->proc = 0;
   for(;;){
     // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
-    p=0;
     struct proc* proc_to_execute=0;
 
     //TODO: Add ageing
 
     for(int x=0;x<NUM_OF_QUEUES;x++)
     {
+      // printf("%d\n", NUM_OF_QUEUES);
       if(mlfq_queue[x].num_procs==0)
         continue;
+      
       for(int y=0;y<mlfq_queue[x].num_procs;y++)
       {
         acquire(&mlfq_queue[x].arr[y]->lock);
@@ -796,31 +795,20 @@ scheduler(void)
 
     if(proc_to_execute==0)
     continue;
-
+    printf("PROC TO EXECUTE %d\n", proc_to_execute->pid);
     if(proc_to_execute->state!=RUNNABLE)
     {
       release(&proc_to_execute->lock);
       continue;
     }
-    p->state = RUNNING;
+    proc_to_execute->state = RUNNING;
     c->proc = proc_to_execute;
-    swtch(&c->context, &p->context);
+    swtch(&c->context, &proc_to_execute->context);
 
     // Process is done running for now.
     // It should have changed its p->state before coming back.
     c->proc = 0;
-
-
-
-    // for(p = proc; p < &proc[NPROC]; p++) {
-    //   acquire(&p->lock);
-    //   if(p->state == RUNNABLE) {
-    //     // Switch to chosen process.  It is the process's job
-    //     // to release its lock and then reacquire it
-    //     // before jumping back to us.
-    //   }
-    //   release(&p->lock);
-    // }
+    release(&proc_to_execute->lock);
   }
   #endif
 
