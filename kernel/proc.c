@@ -1043,6 +1043,8 @@ set_priority(int static_priority, int pid)
       p->static_priority=static_priority;
       p->niceness=5;
       release(&p->lock);
+      if(static_priority<old_priority)
+        yield();
       return old_priority;
     }
     release(&p->lock);
