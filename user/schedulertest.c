@@ -25,7 +25,7 @@ int main() {
 #if SCHEDULER!=1
           }
 #endif
-          printf("Process %d finished", n);
+          printf("Process %d finished\n", n);
           exit(0);
       } else {
 #if SCHEDULER==2

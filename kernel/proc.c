@@ -768,7 +768,6 @@ scheduler(void)
     struct proc* proc_to_execute=0;
 
     //TODO: Add ageing
-
     for(int x=0;x<NUM_OF_QUEUES;x++)
     {
       // printf("%d\n", NUM_OF_QUEUES);
@@ -792,15 +791,14 @@ scheduler(void)
       if(proc_to_execute!=0)
         break;
     }
-
     if(proc_to_execute==0)
     continue;
-    printf("PROC TO EXECUTE %d\n", proc_to_execute->pid);
     if(proc_to_execute->state!=RUNNABLE)
     {
       release(&proc_to_execute->lock);
       continue;
     }
+    printf("BBBBBBBBBBBBBBBBBBBBBBB");
     proc_to_execute->state = RUNNING;
     c->proc = proc_to_execute;
     swtch(&c->context, &proc_to_execute->context);
@@ -808,6 +806,12 @@ scheduler(void)
     // Process is done running for now.
     // It should have changed its p->state before coming back.
     c->proc = 0;
+    printf("AAAAAAAAAAAAAAAAAAAAAAAAA");
+    if(proc_to_execute->state==RUNNABLE)
+    {
+      add_into_mlfq(proc_to_execute->curr_queue, proc_to_execute);
+    }
+
     release(&proc_to_execute->lock);
   }
   #endif
@@ -837,6 +841,10 @@ sched(void)
     panic("sched interruptible");
 
   //TODO: Insert into current queue
+  #if SCHEDULER==3
+    mlfq_queue[p->curr_queue].arr[mlfq_queue[p->curr_queue].num_procs]=p;
+    mlfq_queue[p->curr_queue].num_procs++;
+  #endif
   intena = mycpu()->intena;
   swtch(&p->context, &mycpu()->context);
   mycpu()->intena = intena;
@@ -920,6 +928,10 @@ wakeup(void *chan)
       acquire(&p->lock);
       if(p->state == SLEEPING && p->chan == chan) {
         p->state = RUNNABLE;
+        #if SCHEDULER==3
+          add_into_mlfq(p->curr_queue, p);
+          p->age=ticks;
+        #endif
       }
       release(&p->lock);
     }
