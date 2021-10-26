@@ -188,3 +188,14 @@ void            virtio_disk_intr(void);
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))
+
+#define MAX_QUEUE_SIZE 100
+#define NUM_OF_QUEUES 5
+#define OLD_AGE 25
+struct MLFQ_Queue
+{
+  struct proc* arr[MAX_QUEUE_SIZE];
+  int num_procs;
+};
+
+extern struct MLFQ_Queue mlfq_queue[NUM_OF_QUEUES];

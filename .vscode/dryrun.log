@@ -17,17 +17,26 @@ riscv64-linux-gnu-gcc    -c -o kernel/trampoline.o kernel/trampoline.S
 riscv64-linux-gnu-gcc -Wall -Werror -O -fno-omit-frame-pointer -ggdb -MD -mcmodel=medany -ffreestanding -fno-common -nostdlib -mno-relax -I. -fno-stack-protector -fno-pie -no-pie -DSCHEDULER=0   -c -o kernel/trap.o kernel/trap.c
 riscv64-linux-gnu-gcc -Wall -Werror -O -fno-omit-frame-pointer -ggdb -MD -mcmodel=medany -ffreestanding -fno-common -nostdlib -mno-relax -I. -fno-stack-protector -fno-pie -no-pie -DSCHEDULER=0   -c -o kernel/syscall.o kernel/syscall.c
 riscv64-linux-gnu-gcc -Wall -Werror -O -fno-omit-frame-pointer -ggdb -MD -mcmodel=medany -ffreestanding -fno-common -nostdlib -mno-relax -I. -fno-stack-protector -fno-pie -no-pie -DSCHEDULER=0   -c -o kernel/sysproc.o kernel/sysproc.c
+ 
 riscv64-linux-gnu-gcc -Wall -Werror -O -fno-omit-frame-pointer -ggdb -MD -mcmodel=medany -ffreestanding -fno-common -nostdlib -mno-relax -I. -fno-stack-protector -fno-pie -no-pie -DSCHEDULER=0   -c -o kernel/bio.o kernel/bio.c
+ 
 riscv64-linux-gnu-gcc -Wall -Werror -O -fno-omit-frame-pointer -ggdb -MD -mcmodel=medany -ffreestanding -fno-common -nostdlib -mno-relax -I. -fno-stack-protector -fno-pie -no-pie -DSCHEDULER=0   -c -o kernel/fs.o kernel/fs.c
+ 
 riscv64-linux-gnu-gcc -Wall -Werror -O -fno-omit-frame-pointer -ggdb -MD -mcmodel=medany -ffreestanding -fno-common -nostdlib -mno-relax -I. -fno-stack-protector -fno-pie -no-pie -DSCHEDULER=0   -c -o kernel/log.o kernel/log.c
+ 
 riscv64-linux-gnu-gcc -Wall -Werror -O -fno-omit-frame-pointer -ggdb -MD -mcmodel=medany -ffreestanding -fno-common -nostdlib -mno-relax -I. -fno-stack-protector -fno-pie -no-pie -DSCHEDULER=0   -c -o kernel/sleeplock.o kernel/sleeplock.c
 riscv64-linux-gnu-gcc -Wall -Werror -O -fno-omit-frame-pointer -ggdb -MD -mcmodel=medany -ffreestanding -fno-common -nostdlib -mno-relax -I. -fno-stack-protector -fno-pie -no-pie -DSCHEDULER=0   -c -o kernel/file.o kernel/file.c
 riscv64-linux-gnu-gcc -Wall -Werror -O -fno-omit-frame-pointer -ggdb -MD -mcmodel=medany -ffreestanding -fno-common -nostdlib -mno-relax -I. -fno-stack-protector -fno-pie -no-pie -DSCHEDULER=0   -c -o kernel/pipe.o kernel/pipe.c
+ 
 riscv64-linux-gnu-gcc -Wall -Werror -O -fno-omit-frame-pointer -ggdb -MD -mcmodel=medany -ffreestanding -fno-common -nostdlib -mno-relax -I. -fno-stack-protector -fno-pie -no-pie -DSCHEDULER=0   -c -o kernel/exec.o kernel/exec.c
+ 
 riscv64-linux-gnu-gcc -Wall -Werror -O -fno-omit-frame-pointer -ggdb -MD -mcmodel=medany -ffreestanding -fno-common -nostdlib -mno-relax -I. -fno-stack-protector -fno-pie -no-pie -DSCHEDULER=0   -c -o kernel/sysfile.o kernel/sysfile.c
 riscv64-linux-gnu-gcc    -c -o kernel/kernelvec.o kernel/kernelvec.S
+ 
 riscv64-linux-gnu-gcc -Wall -Werror -O -fno-omit-frame-pointer -ggdb -MD -mcmodel=medany -ffreestanding -fno-common -nostdlib -mno-relax -I. -fno-stack-protector -fno-pie -no-pie -DSCHEDULER=0   -c -o kernel/plic.o kernel/plic.c
+ 
 riscv64-linux-gnu-gcc -Wall -Werror -O -fno-omit-frame-pointer -ggdb -MD -mcmodel=medany -ffreestanding -fno-common -nostdlib -mno-relax -I. -fno-stack-protector -fno-pie -no-pie -DSCHEDULER=0   -c -o kernel/virtio_disk.o kernel/virtio_disk.c
+ 
 riscv64-linux-gnu-gcc -Wall -Werror -O -fno-omit-frame-pointer -ggdb -MD -mcmodel=medany -ffreestanding -fno-common -nostdlib -mno-relax -I. -fno-stack-protector -fno-pie -no-pie -DSCHEDULER=0 -march=rv64g -nostdinc -I. -Ikernel -c user/initcode.S -o user/initcode.o
 riscv64-linux-gnu-ld -z max-page-size=4096 -N -e start -Ttext 0 -o user/initcode.out user/initcode.o
 riscv64-linux-gnu-objcopy -S -O binary user/initcode.out user/initcode

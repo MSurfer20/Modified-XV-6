@@ -6,9 +6,11 @@
 #include "proc.h"
 #include "defs.h"
 
-#ifndef SCHEDULER
-#define SCHEDULER 2
-#endif
+// #ifndef SCHEDULER
+#define SCHEDULER 3
+// #endif
+
+struct MLFQ_Queue mlfq_queue[NUM_OF_QUEUES];
 
 struct cpu cpus[NCPU];
 
@@ -534,6 +536,23 @@ update_time()
   }
 }
 
+void
+remove_from_mlfq(int queue_no, int proc_idx)
+{
+  for(int x=proc_idx;x<mlfq_queue[queue_no].num_procs-1;x++)
+  {
+    mlfq_queue[queue_no].arr[x]=mlfq_queue[queue_no].arr[x+1];
+  }
+  mlfq_queue[queue_no].num_procs--;
+}
+
+void
+add_into_mlfq(int queue_no, struct proc* p)
+{
+  mlfq_queue[queue_no].arr[mlfq_queue[queue_no].num_procs]=p;
+  mlfq_queue[queue_no].num_procs++;
+}
+
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
 // Scheduler never returns.  It loops, doing:
@@ -737,6 +756,71 @@ scheduler(void)
       }
     }
     release(&highest_priority_proc->lock);
+  }
+  #endif
+
+  #if SCHEDULER==3
+  struct proc *p;
+  struct cpu *c = mycpu();
+  
+  c->proc = 0;
+  for(;;){
+    // Avoid deadlock by ensuring that devices can interrupt.
+    intr_on();
+    p=0;
+    struct proc* proc_to_execute=0;
+
+    //TODO: Add ageing
+
+    for(int x=0;x<NUM_OF_QUEUES;x++)
+    {
+      if(mlfq_queue[x].num_procs==0)
+        continue;
+      for(int y=0;y<mlfq_queue[x].num_procs;y++)
+      {
+        acquire(&mlfq_queue[x].arr[y]->lock);
+        struct proc* temp_proc;
+        temp_proc=mlfq_queue[x].arr[y];
+        if(temp_proc->state!=RUNNABLE)
+        {
+          release(&temp_proc->lock);
+          continue;
+        }
+        proc_to_execute=temp_proc;
+        remove_from_mlfq(x,y);
+        break;
+      }
+      if(proc_to_execute!=0)
+        break;
+    }
+
+    if(proc_to_execute==0)
+    continue;
+
+    if(proc_to_execute->state!=RUNNABLE)
+    {
+      release(&proc_to_execute->lock);
+      continue;
+    }
+    p->state = RUNNING;
+    c->proc = proc_to_execute;
+    swtch(&c->context, &p->context);
+
+    // Process is done running for now.
+    // It should have changed its p->state before coming back.
+    c->proc = 0;
+
+
+
+    // for(p = proc; p < &proc[NPROC]; p++) {
+    //   acquire(&p->lock);
+    //   if(p->state == RUNNABLE) {
+    //     // Switch to chosen process.  It is the process's job
+    //     // to release its lock and then reacquire it
+    //     // before jumping back to us.
+    //   }
+    //   release(&p->lock);
+    // }
   }
   #endif
 
