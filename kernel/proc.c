@@ -6,9 +6,9 @@
 #include "proc.h"
 #include "defs.h"
 
-// #ifndef SCHEDULER
+#ifndef SCHEDULER
 #define SCHEDULER 3
-// #endif
+#endif
 
 struct MLFQ_Queue mlfq_queue[NUM_OF_QUEUES];
 
@@ -139,13 +139,18 @@ found:
   p->stime=0;
   p->etime=0;
   p->niceness=5;
-  p->scheduled_count=0;
   p->static_priority=60;
+
+  p->scheduled_count=0;
   p->curr_queue=0;
+  for(int x=0;x<NUM_OF_QUEUES;x++)
+    p->time_spent_queues[x]=0;
+  p->age=0;
+  p->qwtime=0;
+  p->qrtime=0;
+  p->overshot_flag=0;
   #if SCHEDULER==3
-    int curr_index=mlfq_queue[0].num_procs;
-    mlfq_queue[0].arr[curr_index]=p;
-    mlfq_queue[0].num_procs++;
+    add_into_mlfq(0, p);
   #endif
 
   // Allocate a trapframe page.
@@ -788,7 +793,6 @@ scheduler(void)
 
   #if SCHEDULER==3
   struct cpu *c = mycpu();
-  
   c->proc = 0;
   for(;;){
     // Avoid deadlock by ensuring that devices can interrupt.
@@ -843,7 +847,6 @@ scheduler(void)
       release(&proc_to_execute->lock);
       continue;
     }
-    printf("BBBBBBBBBBBBBBBBBBBBBBB");
     proc_to_execute->state = RUNNING;
     c->proc = proc_to_execute;
     swtch(&c->context, &proc_to_execute->context);
@@ -851,7 +854,12 @@ scheduler(void)
     // Process is done running for now.
     // It should have changed its p->state before coming back.
     c->proc = 0;
-    printf("AAAAAAAAAAAAAAAAAAAAAAAAA");
+    if(proc_to_execute->overshot_flag==1)
+    {
+      if(proc_to_execute->curr_queue != NUM_OF_QUEUES-1)
+        proc_to_execute->curr_queue++;
+      proc_to_execute->overshot_flag=0;
+    }
     if(proc_to_execute->state==RUNNABLE)
     {
       add_into_mlfq(proc_to_execute->curr_queue, proc_to_execute);
@@ -975,7 +983,6 @@ wakeup(void *chan)
         p->state = RUNNABLE;
         #if SCHEDULER==3
           add_into_mlfq(p->curr_queue, p);
-          p->age=ticks;
         #endif
       }
       release(&p->lock);

@@ -110,6 +110,9 @@ int             set_priority(int, int);
 void            update_time(void);
 void            update_q_wtime(void);
 
+void            add_into_mlfq(int, struct proc *);
+void            set_overshot_proc();
+
 // swtch.S
 void            swtch(struct context*, struct context*);
 

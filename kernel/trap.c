@@ -157,14 +157,17 @@ kerneltrap()
       yield();
   #endif
   
-  // #if SCHEDULER==3
-  int ticks_limit = 1<<(myproc()->curr_queue);
-  if(myproc()->qrtime>=ticks_limit)
+  #if SCHEDULER==3
+  if(myproc()!=0)
   {
-    set_overshot_proc();
-    yield();
+    int ticks_limit = 1<<(myproc()->curr_queue);
+    if(myproc()->qrtime>=ticks_limit)
+    {
+      set_overshot_proc();
+      yield();
+    }
   }
-  // #endif
+  #endif
 
   // the yield() may have caused some traps to occur,
   // so restore trap registers for use by kernelvec.S's sepc instruction.
