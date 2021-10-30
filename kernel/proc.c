@@ -625,6 +625,7 @@ scheduler(void)
         // to release its lock and then reacquire it
         // before jumping back to us.
         p->state = RUNNING;
+        p->scheduled_count++;
         c->proc = p;
         swtch(&c->context, &p->context);
 
@@ -670,6 +671,7 @@ scheduler(void)
         // Switch to chosen process.  It is the process's job
         // to release its lock and then reacquire it
         // before jumping back to us.
+        lowest_time_proc->scheduled_count++;
         lowest_time_proc->state = RUNNING;
         c->proc = lowest_time_proc;
         // printf("PID: %d CPU: %d START TIME: %d\n", lowest_time_proc->pid, cpuid(), lowest_time_proc->ctime);
@@ -1069,7 +1071,7 @@ procdump(void)
   };
   struct proc *p;
   char *state;
-  int pid,priority,rtime,wtime,nrun;
+  int pid,rtime,wtime,nrun;
   printf("PID\t");
   #if SCHEDULER==2 || SCHEDULER==3
   printf("Priority\t");
@@ -1091,17 +1093,17 @@ procdump(void)
     #if SCHEDULER==2
       int static_priority=p->static_priority;
       int niceness=p->niceness;
-      priority=static_priority-niceness+5;
+      int priority=static_priority-niceness+5;
       printf("%d\t\t", priority);
     #elif SCHEDULER==3
-      priority=p->curr_queue;
+      int priority=p->curr_queue;
       if(p->state==ZOMBIE)
         priority = -1;
       printf("%d\t\t", priority);
     #endif
     printf("%s\t", state);
     #if SCHEDULER!=3
-    wtime = p->etime - p->ctime - p->rtime;
+    wtime = ticks - p->ctime - p->rtime;
     #else
     wtime=p->qwtime;
     #endif
