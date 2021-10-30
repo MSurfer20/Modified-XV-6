@@ -33,6 +33,11 @@ int main() {
 #endif
       }
   }
+  for(volatile int x=0; x<1000000000;x++){}
+  set_priority(30, 11);
+  for(volatile int x=0; x<100;x++){}
+  set_priority(35, 13);
+  printf("YAYYYYYY");
   for(;n > 0; n--) {
       if(waitx(0,&wtime,&rtime) >= 0) {
           trtime += rtime;

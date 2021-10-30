@@ -694,89 +694,66 @@ scheduler(void)
     // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
     struct proc* highest_priority_proc = 0;
-    int highest_priority=1100, highest_priority_scheduled_count=0;
-    uint highest_priority_ctime=0;
-    for(p = proc; p < &proc[NPROC]; p++) {
+    int highest_priority=110000;
+    for(p = proc; p < &proc[NPROC]; p++)
+    {
       acquire(&p->lock);
-      if(p->state == RUNNABLE) {
+      if(p->state == RUNNABLE)
+      {
         int static_priority=p->static_priority;
         int niceness=p->niceness;
         int priority=static_priority-niceness+5;
+        if(p->pid==8)
+        {
+          printf("%d %d %d\n", static_priority, niceness, priority);
+        }
         if(priority<0)
           priority=0;
         else if(priority>100)
           priority=100;
         if(highest_priority_proc==0)
         {
-          highest_priority_proc=p;
-          highest_priority=priority;
-          highest_priority_scheduled_count=p->scheduled_count;
-          highest_priority_ctime=p->ctime;
+          highest_priority_proc = p;
+          highest_priority = priority;
         }
-        else if(priority<highest_priority)
+        else if(priority < highest_priority)
         {
           release(&highest_priority_proc->lock);
-          highest_priority_proc=p;
-          highest_priority=priority;
-          highest_priority_scheduled_count=p->scheduled_count;
-          highest_priority_ctime=p->ctime;
+          highest_priority_proc = p;
+          highest_priority = priority;
         }
         else if(priority==highest_priority)
         {
-          if(p->scheduled_count < highest_priority_scheduled_count)
+          if(p->scheduled_count < highest_priority_proc->scheduled_count)
           {
             release(&highest_priority_proc->lock);
             highest_priority_proc=p;
             highest_priority=priority;
-            highest_priority_scheduled_count=p->scheduled_count;
-            highest_priority_ctime=p->ctime;
           }
-          else if(p->scheduled_count==highest_priority_scheduled_count && p->ctime<highest_priority_ctime)
+          else if(p->scheduled_count==highest_priority_proc->scheduled_count && p->ctime < highest_priority_proc->ctime)
           {
             release(&highest_priority_proc->lock);
-            highest_priority_proc=p;
-            highest_priority=priority;
-            highest_priority_scheduled_count=p->scheduled_count;
-            highest_priority_ctime=p->ctime;
+            highest_priority_proc = p;
+            highest_priority = priority;
           }
           else
             release(&p->lock);
         }
         else release(&p->lock);
-        // Switch to chosen process.  It is the process's job
-        // to release its lock and then reacquire it
-        // before jumping back to us.
-
-        // Process is done running for now.
-        // It should have changed its p->state before coming back.
       }
       else
         release(&p->lock);
     }
     if(highest_priority_proc==0)
       continue;
-    // acquire(&highest_priority_proc->lock);
     if(highest_priority_proc->state == RUNNABLE) 
     {
-
-      // printf("RUNNING PROC %d\n", (int)lowest_time_proc->pid);
-      // Switch to chosen process.  It is the process's job
-      // to release its lock and then reacquire it
-      // before jumping back to us.
-      // printf("%d %d\n", highest_priority, (int)highest_priority_proc->pid);
-      // printf("YASSSSSSSSs");
-      // printf("%d\n", highest_priority_proc->state);
       highest_priority_proc->state = RUNNING;
       c->proc = highest_priority_proc;
       swtch(&c->context, &highest_priority_proc->context);
-      // printf("PID: %d CPU: %d START TIME: %d\n", highest_priority_proc->pid, cpuid(), highest_priority_proc->ctime);
-      // printf("%d\n", highest_priority_proc->state);
 
-      // Process is done running for now.
-      // It should have changed its p->state before coming back.
       c->proc = 0;
       highest_priority_proc->scheduled_count+=1;
-      // printf("%d %d\n", highest_priority_proc->stime, highest_priority_proc->rtime);
       if((highest_priority_proc->stime)+(highest_priority_proc->rtime) > 0)
       {
         int sum_of_val=(highest_priority_proc->stime)+(highest_priority_proc->rtime);
@@ -788,7 +765,6 @@ scheduler(void)
           new_niceness = (sleep_time)/(sum_of_val);
           highest_priority_proc->niceness=new_niceness;
         }
-        printf("NEW NICENESS: %d\n", highest_priority_proc->niceness);
       }
     }
     release(&highest_priority_proc->lock);
@@ -1131,7 +1107,7 @@ int
 set_priority(int static_priority, int pid)
 {
   struct proc *p;
-  int old_priority=-1;
+  int old_priority=110;
 
   for(p = proc; p < &proc[NPROC]; p++){
     acquire(&p->lock);
