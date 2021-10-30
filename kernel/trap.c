@@ -156,6 +156,14 @@ kerneltrap()
     if(which_dev == 2 && myproc() != 0 && myproc()->state == RUNNING)
       yield();
   #endif
+  
+  // #if SCHEDULER==3
+  int ticks_limit = 1<<(myproc()->curr_queue);
+  if(myproc()->qrtime>=ticks_limit)
+  {
+    
+  }
+  // #endif
 
   // the yield() may have caused some traps to occur,
   // so restore trap registers for use by kernelvec.S's sepc instruction.
@@ -171,6 +179,10 @@ clockintr()
   update_time();
   wakeup(&ticks);
   release(&tickslock);
+  #if SCHEDULER == 3
+  update_q_wtime();
+  #endif
+  
 }
 
 // check if it's an external interrupt or software interrupt,

@@ -108,6 +108,7 @@ void            procdump(void);
 int             trace(int);
 int             set_priority(int, int);
 void            update_time(void);
+void            update_q_wtime(void);
 
 // swtch.S
 void            swtch(struct context*, struct context*);
@@ -191,7 +192,7 @@ void            virtio_disk_intr(void);
 
 #define MAX_QUEUE_SIZE 100
 #define NUM_OF_QUEUES 5
-#define OLD_AGE 25
+#define MAX_OLD_AGE 25
 struct MLFQ_Queue
 {
   struct proc* arr[MAX_QUEUE_SIZE];

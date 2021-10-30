@@ -114,8 +114,12 @@ struct proc {
   int trace_mask;
   int static_priority;
   int niceness;
+
+
   int scheduled_count;
   int curr_queue;
   int time_spent_queues[5];
   uint age;
+  uint qwtime;
+  uint qrtime;
 };

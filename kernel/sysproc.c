@@ -139,9 +139,7 @@ sys_trace(void)
     return -1;
   
   int return_val = trace(trace_mask);
-  if(return_val<0)
-  return -1;
-  return trace_mask;
+  return return_val;
 }
 
 uint64

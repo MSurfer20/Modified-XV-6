@@ -168,22 +168,21 @@ syscall(void)
   struct proc *p = myproc();
 
   num = p->trapframe->a7;
-  // if(num==SYS_trace)
-  //   printf("YAY");
-  // printf("%d %d %d\n", num, NELEM(syscalls), syscalls[num]);
+  int arg1, arg2, arg3;
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
+
+    argint(0,&arg1);
+    argint(1,&arg2);
+    argint(2,&arg3);
     
-    // if(num==SYS_trace)
-    //   printf("YAY");
+    p->trapframe->a0 = syscalls[num]();
     
+    int return_val=p->trapframe->a0;
     int trace_mask=p->trace_mask;
     int temp=(1<<num) & (trace_mask);
-    if(num==SYS_exit || num==SYS_kill)
-      temp=0;
+
     if(temp)
     {
-      // if(num==SYS_trace)
-      // printf("YAY");
       int pid=p->pid;
       printf("%d: syscall %s (", pid, syscall_number_to_name[num]);
       if(num==SYS_getpid || num==SYS_fork || num==SYS_uptime)
@@ -192,28 +191,17 @@ syscall(void)
       }
       if(num==SYS_exit || num==SYS_wait || num==SYS_pipe || num==SYS_kill || num==SYS_chdir || num==SYS_sleep || num==SYS_unlink || num==SYS_dup || num==SYS_mkdir || num==SYS_trace || num==SYS_close || num==SYS_sbrk)
       {
-        int arg1;
-        argint(0,&arg1);
         printf("%d)", arg1);
       }
       else if(num==SYS_exec || num==SYS_fstat || num==SYS_link || num==SYS_open || num==SYS_set_priority)
       {
-      int arg1,arg2;
-      argint(0,&arg1);
-      argint(1,&arg2);
       printf("%d %d)", arg1, arg2); 
       }
       else if(num==SYS_read || num==SYS_write || num==SYS_mknod)
       {
-      int arg1,arg2,arg3;
-      argint(0,&arg1);
-      argint(1,&arg2);
-      argint(2,&arg3);
       printf("%d %d %d)", arg1, arg2, arg3); 
       }
     }
-    p->trapframe->a0 = syscalls[num]();
-    int return_val=p->trapframe->a0;
     if(temp)
       printf(" -> %d\n", return_val);
   } else {

@@ -6,9 +6,9 @@
 #include "proc.h"
 #include "defs.h"
 
-#ifndef SCHEDULER
+// #ifndef SCHEDULER
 #define SCHEDULER 3
-#endif
+// #endif
 
 struct MLFQ_Queue mlfq_queue[NUM_OF_QUEUES];
 
@@ -536,6 +536,24 @@ update_time()
 }
 
 void
+update_q_wtime()
+{
+  struct proc* p;
+  for (p = proc; p < &proc[NPROC]; p++) {
+    acquire(&p->lock);
+    if (p->state == RUNNING) {
+      p->time_spent_queues[p->curr_queue]++;
+      p->qrtime++;
+    }
+    else if(p->state == SLEEPING)
+    {
+      p->age++;
+    }
+    release(&p->lock); 
+  }
+}
+
+void
 remove_from_mlfq(int queue_no, int proc_idx)
 {
   for(int x=proc_idx;x<mlfq_queue[queue_no].num_procs-1;x++)
@@ -550,6 +568,7 @@ add_into_mlfq(int queue_no, struct proc* p)
 {
   mlfq_queue[queue_no].arr[mlfq_queue[queue_no].num_procs]=p;
   mlfq_queue[queue_no].num_procs++;
+  p->age=0;
 }
 
 // Per-CPU process scheduler.
@@ -686,7 +705,7 @@ scheduler(void)
         }
         else if(priority==highest_priority)
         {
-          if(p->scheduled_count>highest_priority_scheduled_count)
+          if(p->scheduled_count < highest_priority_scheduled_count)
           {
             release(&highest_priority_proc->lock);
             highest_priority_proc=p;
@@ -768,6 +787,23 @@ scheduler(void)
     struct proc* proc_to_execute=0;
 
     //TODO: Add ageing
+
+    for(int x=1;x<NUM_OF_QUEUES;x++)
+    {
+      int queue_size=mlfq_queue[x].num_procs;
+      for(int y=0;y<queue_size;y++)
+      {
+        struct proc* ageing_proc;
+        ageing_proc=mlfq_queue[x].arr[y];
+        if(ageing_proc->age>MAX_OLD_AGE)
+        {
+          remove_from_mlfq(x, y);
+          add_into_mlfq(x-1, ageing_proc);
+        }
+      }
+    }
+
+
     for(int x=0;x<NUM_OF_QUEUES;x++)
     {
       // printf("%d\n", NUM_OF_QUEUES);
