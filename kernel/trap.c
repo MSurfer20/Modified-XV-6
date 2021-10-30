@@ -197,6 +197,7 @@ clockintr()
   update_q_wtime();
   #endif
   wakeup(&ticks);
+  procdump();
   release(&tickslock);
 }
 

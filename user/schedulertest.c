@@ -18,13 +18,12 @@ int main() {
       if (pid == 0) {
 #if SCHEDULER!=1
           if (n < IO) {
-            for (volatile int i = 0; i < 1000000000; i++) {} // CPU bound process 
+            for (volatile int i = 0; 1>0; i++) {} // CPU bound process 
             sleep(200); // IO bound processes
-            printf("SLEEEEEEEEEEEEEEPPPPPPPPPPPPPPPPPP");
-            for (volatile int i = 0; i < 1000000000; i++) {} // CPU bound process 
+            for (volatile int i = 0; 1>0; i++) {} // CPU bound process 
           } else {
 #endif
-            for (volatile int i = 0; i < 1000000000; i++) {} // CPU bound process 
+            for (volatile int i = 0; 1>0; i++) {} // CPU bound process 
 #if SCHEDULER!=1
           }
 #endif
@@ -39,7 +38,7 @@ int main() {
   for(volatile int x=0; x<1000000000;x++){}
   pid = fork();
       if (pid == 0) {
-        for (volatile int i = 0; i < 1000000000; i++) {} // CPU bound process 
+        for (volatile int i = 0; 1>0; i++) {} // CPU bound process 
           }
           printf("Process %d finished\n", n);
           exit(0);
@@ -51,7 +50,7 @@ int main() {
             sleep(200); // IO bound processes
           } else {
 #endif
-            for (volatile int i = 0; i < 1000000000; i++) {} // CPU bound process 
+            for (volatile int i = 0; 1>0; i++) {} // CPU bound process 
 #if SCHEDULER!=1
           }
 #endif
