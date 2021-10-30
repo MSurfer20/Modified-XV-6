@@ -148,9 +148,9 @@ found:
   p->qwtime=0;
   p->qrtime=0;
   p->overshot_flag=0;
-  #if SCHEDULER==3
-    add_into_mlfq(0, p);
-  #endif
+  // #if SCHEDULER==3
+  //   add_into_mlfq(0, p);
+  // #endif
 
   // Allocate a trapframe page.
   if((p->trapframe = (struct trapframe *)kalloc()) == 0){
@@ -283,6 +283,9 @@ userinit(void)
 
 
   release(&p->lock);
+  #if SCHEDULER==3
+    add_into_mlfq(0, p);
+  #endif
 }
 
 // Grow or shrink user memory by n bytes.
@@ -355,6 +358,11 @@ fork(void)
   np->state = RUNNABLE;
   //TODO: Insert the process into the 0th queue
   release(&np->lock);
+  #if SCHEDULER==3
+    add_into_mlfq(0, np);
+    if(p!=0 && p->curr_queue>0)
+      yield();
+  #endif
 
   return pid;
 }
@@ -560,7 +568,7 @@ update_q_wtime()
       p->time_spent_queues[p->curr_queue]++;
       p->qrtime++;
     }
-    else if(p->state == SLEEPING)
+    else if(p->state == RUNNABLE)
     {
       p->qwtime++;
     }
@@ -585,6 +593,7 @@ add_into_mlfq(int queue_no, struct proc* p)
   mlfq_queue[queue_no].num_procs++;
   p->qrtime=0;
   p->qwtime=0;
+  p->curr_queue=queue_no;
 }
 
 // Per-CPU process scheduler.
@@ -788,8 +797,9 @@ scheduler(void)
       {
         struct proc* ageing_proc;
         ageing_proc=mlfq_queue[x].arr[y];
-        if(ageing_proc->age>MAX_OLD_AGE && x>0)
+        if(ageing_proc->qwtime>MAX_OLD_AGE && x>0)
         {
+          printf("SUCH AGED MUCH WOW\n");
           remove_from_mlfq(x, y);
           add_into_mlfq(x-1, ageing_proc);
         }
