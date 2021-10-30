@@ -536,6 +536,15 @@ update_time()
 }
 
 void
+set_overshot_proc()
+{
+  struct proc* p = myproc();
+  acquire(&p->lock);
+  p->overshot_flag=1;
+  release(&p->lock);
+}
+
+void
 update_q_wtime()
 {
   struct proc* p;

@@ -161,7 +161,8 @@ kerneltrap()
   int ticks_limit = 1<<(myproc()->curr_queue);
   if(myproc()->qrtime>=ticks_limit)
   {
-    
+    set_overshot_proc();
+    yield();
   }
   // #endif
 
@@ -177,11 +178,11 @@ clockintr()
   acquire(&tickslock);
   ticks++;
   update_time();
-  wakeup(&ticks);
-  release(&tickslock);
   #if SCHEDULER == 3
   update_q_wtime();
   #endif
+  wakeup(&ticks);
+  release(&tickslock);
   
 }
 

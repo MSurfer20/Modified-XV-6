@@ -122,4 +122,5 @@ struct proc {
   uint age;
   uint qwtime;
   uint qrtime;
+  int overshot_flag;
 };
