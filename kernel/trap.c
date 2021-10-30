@@ -5,7 +5,7 @@
 #include "spinlock.h"
 #include "proc.h"
 #include "defs.h"
-
+ 
 struct spinlock tickslock;
 uint ticks;
 
