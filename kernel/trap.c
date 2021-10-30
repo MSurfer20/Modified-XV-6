@@ -186,7 +186,6 @@ clockintr()
   #endif
   wakeup(&ticks);
   release(&tickslock);
-  
 }
 
 // check if it's an external interrupt or software interrupt,

@@ -1059,7 +1059,15 @@ procdump(void)
   };
   struct proc *p;
   char *state;
-
+  int pid,priority,rtime,wtime,nrun;
+  printf("PID\t");
+  #if SCHEDULER==2 || SCHEDULER==3
+  printf("Priority\t");
+  #endif
+  printf("State\trtime\twtime\tnrun");
+  #if SCHEDULER==3
+  printf("\tq0\tq1\tq2\tq3\tq4");
+  #endif
   printf("\n");
   for(p = proc; p < &proc[NPROC]; p++){
     if(p->state == UNUSED)
@@ -1068,7 +1076,32 @@ procdump(void)
       state = states[p->state];
     else
       state = "???";
-    printf("%d %s %s %d %d", p->pid, state, p->name, p->niceness, p->static_priority);
+    pid=p->pid;
+    printf("%d\t", pid);
+    #if SCHEDULER==2
+      int static_priority=p->static_priority;
+      int niceness=p->niceness;
+      priority=static_priority-niceness+5;
+      printf("%d\t\t", priority);
+    #elif SCHEDULER==3
+      priority=p->curr_queue;
+      if(p->state==ZOMBIE)
+        priority = -1;
+      printf("%d\t\t", priority);
+    #endif
+    printf("%s\t", state);
+    #if SCHEDULER!=3
+    wtime = p->etime - p->ctime - p->rtime;
+    #else
+    wtime=p->qwtime;
+    #endif
+    rtime=p->rtime;
+    nrun=p->scheduled_count;
+    printf("%d\t%d\t%d\t", rtime, wtime, nrun);
+    #if SCHEDULER==3
+    for(int x=0;x<NUM_OF_QUEUES;x++)
+    printf("%d\t", p->time_spent_queues[x]);
+    #endif
     printf("\n");
   }
 }
