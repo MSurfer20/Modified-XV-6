@@ -18,9 +18,9 @@ int main() {
       if (pid == 0) {
 #if SCHEDULER!=1
           if (n < IO) {
-            for (volatile int i = 0; i < 100000; i++) {} // CPU bound process 
-            sleep(100); // IO bound processes
-            printf("YAYYYYYYYY");
+            for (volatile int i = 0; i < 1000000000; i++) {} // CPU bound process 
+            sleep(200); // IO bound processes
+            printf("SLEEEEEEEEEEEEEEPPPPPPPPPPPPPPPPPP");
             for (volatile int i = 0; i < 1000000000; i++) {} // CPU bound process 
           } else {
 #endif
@@ -37,8 +37,6 @@ int main() {
       }
   }
   for(volatile int x=0; x<1000000000;x++){}
-  printf("YAYYYYYY");
-  printf("NAYA FORKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
   pid = fork();
       if (pid == 0) {
         for (volatile int i = 0; i < 1000000000; i++) {} // CPU bound process 
@@ -64,7 +62,6 @@ int main() {
         set_priority(80, pid); // Will only matter for PBS, set lower priority for IO bound processes 
 #endif
       }
-  printf("YAYYYYYY");
   for(;n > 0; n--) {
       if(waitx(0,&wtime,&rtime) >= 0) {
           trtime += rtime;

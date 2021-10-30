@@ -799,7 +799,6 @@ scheduler(void)
         ageing_proc=mlfq_queue[x].arr[y];
         if(ageing_proc->qwtime>MAX_OLD_AGE && x>0)
         {
-          printf("SUCH AGED MUCH WOW\n");
           remove_from_mlfq(x, y);
           add_into_mlfq(x-1, ageing_proc);
         }
@@ -843,6 +842,7 @@ scheduler(void)
 
     // printf("AAAAAAAAAAAAAAAAa");
     // printf("%d", proc_to_execute->pid);
+    proc_to_execute->qwtime=0;
     proc_to_execute->state = RUNNING;
     c->proc = proc_to_execute;
     // printf("AAAAAAAAAAAAAAAAa");
