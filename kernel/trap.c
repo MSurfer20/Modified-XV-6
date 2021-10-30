@@ -82,6 +82,18 @@ usertrap(void)
       yield();
   #endif
 
+  #if SCHEDULER==3
+  if(myproc()!=0 && which_dev==2)
+  {
+    int ticks_limit = 1<<(myproc()->curr_queue);
+    if(myproc()->qrtime>=ticks_limit)
+    {
+      set_overshot_proc();
+      yield();
+    }
+  }
+  #endif
+
   usertrapret();
 }
 
@@ -158,7 +170,7 @@ kerneltrap()
   #endif
   
   #if SCHEDULER==3
-  if(myproc()!=0)
+  if(myproc()!=0 && which_dev == 2 && myproc()->state == RUNNING)
   {
     int ticks_limit = 1<<(myproc()->curr_queue);
     if(myproc()->qrtime>=ticks_limit)

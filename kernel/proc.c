@@ -145,7 +145,6 @@ found:
   p->curr_queue=0;
   for(int x=0;x<NUM_OF_QUEUES;x++)
     p->time_spent_queues[x]=0;
-  p->age=0;
   p->qwtime=0;
   p->qrtime=0;
   p->overshot_flag=0;
@@ -546,6 +545,8 @@ set_overshot_proc()
   struct proc* p = myproc();
   acquire(&p->lock);
   p->overshot_flag=1;
+  p->qrtime=0;
+  p->qwtime=0;
   release(&p->lock);
 }
 
@@ -561,7 +562,7 @@ update_q_wtime()
     }
     else if(p->state == SLEEPING)
     {
-      p->age++;
+      p->qwtime++;
     }
     release(&p->lock); 
   }
@@ -582,7 +583,8 @@ add_into_mlfq(int queue_no, struct proc* p)
 {
   mlfq_queue[queue_no].arr[mlfq_queue[queue_no].num_procs]=p;
   mlfq_queue[queue_no].num_procs++;
-  p->age=0;
+  p->qrtime=0;
+  p->qwtime=0;
 }
 
 // Per-CPU process scheduler.
@@ -808,7 +810,7 @@ scheduler(void)
       {
         struct proc* ageing_proc;
         ageing_proc=mlfq_queue[x].arr[y];
-        if(ageing_proc->age>MAX_OLD_AGE)
+        if(ageing_proc->age>MAX_OLD_AGE && x>0)
         {
           remove_from_mlfq(x, y);
           add_into_mlfq(x-1, ageing_proc);
@@ -842,30 +844,38 @@ scheduler(void)
     }
     if(proc_to_execute==0)
     continue;
+
+    // printf("AAAAAAAAAAAAAAAAa");
+
     if(proc_to_execute->state!=RUNNABLE)
     {
       release(&proc_to_execute->lock);
       continue;
     }
+
+    // printf("AAAAAAAAAAAAAAAAa");
+    // printf("%d", proc_to_execute->pid);
     proc_to_execute->state = RUNNING;
     c->proc = proc_to_execute;
+    // printf("AAAAAAAAAAAAAAAAa");
     swtch(&c->context, &proc_to_execute->context);
 
     // Process is done running for now.
     // It should have changed its p->state before coming back.
+    // printf("AAAAAAAAAAAAAAAAa");
     c->proc = 0;
-    if(proc_to_execute->overshot_flag==1)
-    {
-      if(proc_to_execute->curr_queue != NUM_OF_QUEUES-1)
-        proc_to_execute->curr_queue++;
-      proc_to_execute->overshot_flag=0;
-    }
     if(proc_to_execute->state==RUNNABLE)
     {
+      if(proc_to_execute->overshot_flag==1)
+      {
+        if(proc_to_execute->curr_queue != NUM_OF_QUEUES-1)
+          proc_to_execute->curr_queue++;
+        proc_to_execute->overshot_flag=0;
+      }
       add_into_mlfq(proc_to_execute->curr_queue, proc_to_execute);
     }
-
     release(&proc_to_execute->lock);
+    // printf("BBBBBBBBBBBBBBBBBBBBBBBB\n");
   }
   #endif
 
@@ -894,10 +904,10 @@ sched(void)
     panic("sched interruptible");
 
   //TODO: Insert into current queue
-  #if SCHEDULER==3
-    mlfq_queue[p->curr_queue].arr[mlfq_queue[p->curr_queue].num_procs]=p;
-    mlfq_queue[p->curr_queue].num_procs++;
-  #endif  
+  // #if SCHEDULER==3
+  //   mlfq_queue[p->curr_queue].arr[mlfq_queue[p->curr_queue].num_procs]=p;
+  //   mlfq_queue[p->curr_queue].num_procs++;
+  // #endif  
   intena = mycpu()->intena;
   swtch(&p->context, &mycpu()->context);
   mycpu()->intena = intena;
