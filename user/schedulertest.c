@@ -18,7 +18,9 @@ int main() {
       if (pid == 0) {
 #if SCHEDULER!=1
           if (n < IO) {
+            for (volatile int i = 0; i < 1000; i++) {} // CPU bound process 
             sleep(50); // IO bound processes
+            for (volatile int i = 0; i < 1000000000; i++) {} // CPU bound process 
           } else {
 #endif
             for (volatile int i = 0; i < 1000000000; i++) {} // CPU bound process 
