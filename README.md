@@ -99,6 +99,9 @@ Further, we can see the effects of no preemption in FCFS with 15 processes, as t
 
 While we might have expected much better performance from MLFQ, it seems that due to the overheads of managing queue-wise process and their timers, its performance isn't as good as it should have been. It is possible that MLFQ's relative performance would have been much better in case of large number of processes getting executed.
 
+**Thus, we can see that MLFQ works better than the default RR, despite the overhead computations that we are doing in it. Also, we can see how FCFS gives lower run times, but suffers heavily in terms of wait times, as it ends up waiting a lot for the I/O bound processes(which keep switching b/w running and sleeping). Thus, while FCFS isn't better than RR due to double waiting time than RR, MLFQ reduces the run time without any compromise in terms of waiting time. Similarly, PBS also has almost same run time and wait time as RR. Finally, we might even see better relative performance of MLFQ when the number of processes is increased by a LOT.**
+An important point to note is that in case of only CPU bound processes, FCFS might give better performance due to saving the preemption time.
+
 ### BONUS
 I obtained the following graph with the given benchmark code, with the MAX_AGE_LIMIT kept as 30 ticks:
 ![MLFQ-Graph](./Graphs/Graph-1/Figure_1.png)
