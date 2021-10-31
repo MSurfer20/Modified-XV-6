@@ -663,12 +663,6 @@ scheduler(void)
         lowest_time_proc=p;
         else if(p->ctime < lowest_time_proc->ctime)
         lowest_time_proc=p;
-        // Switch to chosen process.  It is the process's job
-        // to release its lock and then reacquire it
-        // before jumping back to us.
-
-        // Process is done running for now.
-        // It should have changed its p->state before coming back.
       }
       release(&p->lock);
     }
@@ -677,9 +671,6 @@ scheduler(void)
     acquire(&lowest_time_proc->lock);
       if(lowest_time_proc->state == RUNNABLE) {
         // printf("RUNNING PROC %d\n", (int)lowest_time_proc->pid);
-        // Switch to chosen process.  It is the process's job
-        // to release its lock and then reacquire it
-        // before jumping back to us.
         lowest_time_proc->scheduled_count++;
         lowest_time_proc->state = RUNNING;
         c->proc = lowest_time_proc;
@@ -712,10 +703,10 @@ scheduler(void)
         int static_priority=p->static_priority;
         int niceness=p->niceness;
         int priority=static_priority-niceness+5;
-        if(p->pid==8)
-        {
-          printf("%d %d %d\n", static_priority, niceness, priority);
-        }
+        // if(p->pid==8)
+        // {
+        //   printf("%d %d %d\n", static_priority, niceness, priority);
+        // }
         if(priority<0)
           priority=0;
         else if(priority>100)
@@ -1100,6 +1091,7 @@ procdump(void)
     for(int x=0;x<NUM_OF_QUEUES;x++)
     printf("%d\t", p->time_spent_queues[x]);
     #endif
+    // printf("%d", p->ctime);
     printf("\n");
   }
 }
