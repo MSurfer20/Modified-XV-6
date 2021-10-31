@@ -7,7 +7,7 @@
 #include "defs.h"
 
 #ifndef SCHEDULER
-#define SCHEDULER 3
+#define SCHEDULER 0
 #endif
 
 struct MLFQ_Queue mlfq_queue[NUM_OF_QUEUES];
@@ -750,10 +750,10 @@ scheduler(void)
     {
       highest_priority_proc->state = RUNNING;
       c->proc = highest_priority_proc;
+      highest_priority_proc->scheduled_count+=1;
       swtch(&c->context, &highest_priority_proc->context);
 
       c->proc = 0;
-      highest_priority_proc->scheduled_count+=1;
       if((highest_priority_proc->stime)+(highest_priority_proc->rtime) > 0)
       {
         int sum_of_val=(highest_priority_proc->stime)+(highest_priority_proc->rtime);
@@ -1109,20 +1109,21 @@ int
 set_priority(int static_priority, int pid)
 {
   struct proc *p;
-  int old_priority=110;
+  int old_static_priority=110, old_dynamic_priority;
 
   for(p = proc; p < &proc[NPROC]; p++){
     acquire(&p->lock);
     if(p->pid == pid){
-      old_priority=p->static_priority;
+      old_dynamic_priority = p->static_priority - p->niceness + 5;
+      old_static_priority=p->static_priority;
       p->static_priority=static_priority;
       p->niceness=5;
       p->stime=0;
       p->rtime=0;
       release(&p->lock);
-      if(static_priority<old_priority)
+      if(static_priority<old_dynamic_priority)
         yield();
-      return old_priority;
+      return old_static_priority;
     }
     release(&p->lock);
   }
