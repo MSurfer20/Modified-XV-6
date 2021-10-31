@@ -119,3 +119,7 @@ I also generated another graph where some processes ran, then slept and then ran
 The graph for the first 400 ticks is:
 ![MLFQ-Graph](./Graphs/Graph-2/plot_400_ticks.png)
 Similar observations can be seen here, along with the fact that some processes remain stuck in certain queues that they reached after running when they start to sleep. For example, the very long P14 line, as well as the long wait of P9 are due to the same reasons. Similar kind of exchange between 3rd and 4th queue, and 2nd and 3rd queue can be seen here(this had lesse AGEING limit).
+
+Another graph that I obtained with normal benchmark code with increased STARVATION LIMIT of 50 is:
+![MLFQ-Graph](./Graphs/Graph-3/Figure_1.png)
+In this case, the to-and-fro between the queues is much lesser, since it takes much more ticks for the process to starve.
