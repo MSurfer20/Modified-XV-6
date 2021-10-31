@@ -18,16 +18,14 @@ int main() {
       if (pid == 0) {
 #if SCHEDULER!=1
           if (n < IO) {
-            for (volatile int i = 0; 1>0; i++) {} // CPU bound process 
-            sleep(200); // IO bound processes
-            for (volatile int i = 0; 1>0; i++) {} // CPU bound process 
+            sleep(50); // IO bound processes
           } else {
 #endif
-            for (volatile int i = 0; 1>0; i++) {} // CPU bound process 
+            for (volatile int i = 0; i < 1000000000; i++) {} // CPU bound process 
 #if SCHEDULER!=1
           }
 #endif
-          printf("Process %d finished\n", n);
+          printf("Process %d finished", n);
           exit(0);
       } else {
 #if SCHEDULER==2
@@ -35,32 +33,41 @@ int main() {
 #endif
       }
   }
-  for(volatile int x=0; x<1000000000;x++){}
-  pid = fork();
-      if (pid == 0) {
-        for (volatile int i = 0; 1>0; i++) {} // CPU bound process 
-          }
-          printf("Process %d finished\n", n);
-          exit(0);
-  for(volatile int x=0; x<100000;x++){}
-  pid = fork();
-      if (pid == 0) {
-#if SCHEDULER!=1
-          if (n < IO) {
-            sleep(200); // IO bound processes
-          } else {
-#endif
-            for (volatile int i = 0; 1>0; i++) {} // CPU bound process 
-#if SCHEDULER!=1
-          }
-#endif
-          printf("Process %d finished\n", n);
-          exit(0);
-      } else {
-#if SCHEDULER==2
-        set_priority(80, pid); // Will only matter for PBS, set lower priority for IO bound processes 
-#endif
-      }
+//   PBS TESTING
+//   set_priority(30, 12);
+//   set_priority(5, 13);
+//   set_priority(23, 11);
+//   printf("YAYYYYYY");
+
+// MLFQ Testing
+//   for(volatile int x=0; x<10000000;x++){}
+// printf("YAYYYYYY");
+//   printf("NAYA FORKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
+//   pid = fork();
+//       if (pid == 0) {
+//         for (volatile int i = 0; i < 1000000000; i++) {} // CPU bound process 
+//           }
+//           printf("Process %d finished\n", n);
+//           exit(0);
+//   for(volatile int x=0; x<100000;x++){}
+//   pid = fork();
+//       if (pid == 0) {
+// #if SCHEDULER!=1
+//           if (n < IO) {
+//             sleep(200); // IO bound processes
+//           } else {
+// #endif
+//             for (volatile int i = 0; i < 1000000000; i++) {} // CPU bound process 
+// #if SCHEDULER!=1
+//           }
+// #endif
+//           printf("Process %d finished\n", n);
+//           exit(0);
+//       } else {
+// #if SCHEDULER==2
+//         set_priority(80, pid); // Will only matter for PBS, set lower priority for IO bound processes 
+// #endif
+//       } 
   for(;n > 0; n--) {
       if(waitx(0,&wtime,&rtime) >= 0) {
           trtime += rtime;
