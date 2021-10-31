@@ -197,7 +197,8 @@ clockintr()
   update_q_wtime();
   #endif
   wakeup(&ticks);
-  procdump();
+  // GRAPH: Call procdump on every tick
+  // procdump();
   release(&tickslock);
 }
 
