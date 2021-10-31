@@ -201,6 +201,8 @@ freeproc(struct proc *p)
   p->niceness=0;
   p->scheduled_count=0;
   p->static_priority=0;
+  for(int x=0;x<NUM_OF_QUEUES;x++)
+    p->time_spent_queues[x]=0;
 }
 
 // Create a user page table for a given process,
@@ -565,12 +567,15 @@ update_q_wtime()
   for (p = proc; p < &proc[NPROC]; p++) {
     acquire(&p->lock);
     if (p->state == RUNNING) {
-      p->time_spent_queues[p->curr_queue]++;
       p->qrtime++;
     }
     else if(p->state == RUNNABLE)
     {
       p->qwtime++;
+    }
+    if(p->state != ZOMBIE)
+    {
+      p->time_spent_queues[p->curr_queue]++;
     }
     release(&p->lock); 
   }
