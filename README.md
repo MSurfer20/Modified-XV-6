@@ -75,3 +75,21 @@ This scheduler algorithm can be exploited by a process by doing redundant I/O ju
 
 ## Benchmark program performance
 I tabulate the outputs of the `schedulertest` code given:
+### For a single CPU:
+| Scheduler type | Avg Run time | Avg Wait time |
+|----------------|--------------|---------------|
+| Round Robin    | 183          | 21            |
+| FCFS           | 195          | 43            |
+| PBS            | 182          | 20            |
+| MLFQ           | 167          | 20            |
+
+### For 3 CPUs:
+| Scheduler type | Avg Run time | Avg Wait time             |
+|----------------|--------------|---------------------------|
+| Round Robin    | 121          | 20                        |
+| FCFS           | 69           | 59                        |
+| PBS            | 130          | 18                        |
+| MLFQ           | -            | -(Only tested on 1 CPU)   |
+
+### Performance comparison
+

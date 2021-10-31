@@ -195,7 +195,7 @@ void            virtio_disk_intr(void);
 
 #define MAX_QUEUE_SIZE 100
 #define NUM_OF_QUEUES 5
-#define MAX_OLD_AGE 40
+#define MAX_OLD_AGE 30
 struct MLFQ_Queue
 {
   struct proc* arr[MAX_QUEUE_SIZE];

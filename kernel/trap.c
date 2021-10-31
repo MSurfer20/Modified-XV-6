@@ -198,7 +198,7 @@ clockintr()
   #endif
   wakeup(&ticks);
   // GRAPH: Call procdump on every tick
-  // procdump();
+  procdump();
   release(&tickslock);
 }
 

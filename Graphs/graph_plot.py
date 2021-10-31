@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 colour_values = ['b','g','r','c','m','y','k','pink', 'indigo', 'navy', 'purple', 'silver', 'darkgreen', 'gold', 'orange', 'gray']
-file = open("./output_file", "r")
+file = open("./Graph-2/output_file", "r")
 queue_values = {}
 tick_values = {}
 tick_no = 0
