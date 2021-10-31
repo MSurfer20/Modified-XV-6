@@ -39,9 +39,8 @@ I did the work of this assignment on top of the repo that was shared in the tuto
 * Then, I added the syscall `set_priority` syscall, along with the `setpriority` user program(in `users/setpriority.c`) to change the priority to a specific value.
     * This also resets the niceness to 5, and also sets the pbs_runtime and sleeptime values to 0.
     * I used a different variable `pbs_rtime` instead of `rtime` for niceness computations, since this is set to 0 in `set_priority`, which would mess up benchmark values. 
-    * This might lead to wrong values in `procdump`, but since this was allowed through a Moodle query, I have implemented this.
-    * Further, after the syscall, if the new dynamic priority(==static priority) is lesser than the previous dynamic priority(used during scheduling), then the process is yielded and rescheduling takes place.
-* The value of niceness is changed only after the scheduled process completes its run.
+    * Further, after the syscall, if the new dynamic priority(==static priority) is lesser than the previous dynamic priority(used during scheduling), then the process is yielded and reschedulig takes place.
+* The value of niceness is changed only after the scheduled process completes its run(as stated in the requirements).
 * The dynamic priority is calculated for all the processes before selecting the one to be scheduled.
 * Now, the process with the highest priority(least value) is selected. In case of ties, number of times the process was scheduled and ctime are used to resolve the process to be selected.
 * Now, we run the process, and after the process gets executed, update the niceness of the process.
@@ -49,7 +48,7 @@ I did the work of this assignment on top of the repo that was shared in the tuto
 * For this scheduler, I initialized 5 arrays(queues) numbered 0 to 4, with 0 having the highest priority.
 * During the initialization of XV-6, I set all the queues to empty.
 * After that, every time during fork and userinit, I insert the process into the **0th queue**. For convenience, I created functions to insert a process into the queue and to delete the ith process from the queue.
-* Further, at the time of inserting into the 0th queue through fork, I check if the current process being executed(through `myproc()`) is in a lower priority queue(1-4), then i yield() and the process gets preempted
+* Further, at the time of inserting into the 0th queue through fork, I check if the current process being executed(through `myproc()`) is in a lower priority queue(1-4), then i yield() and the currently running process gets preempted
 * Now, at the start of the scheduler, I check for ageing in the queues.
     * **For ageing here, as well as for the wtime printed in MLFQ's procdump, I consider the queue wait time as the number of ticks for which the process in that queue was in the RUNNABLE state. This value is what is used for implementing ageing. This was decided upon after clarification from a TA.**
     * The maximum age that is allowed is defined in the MAX_OLD_AGE parameter.
@@ -67,8 +66,8 @@ I did the work of this assignment on top of the repo that was shared in the tuto
 * Note that after running `set_priority()` in PBS, the values of rtime and wtime may become weird, since they are supposed to be reset when `set_priority()` is run. To avoid this, I changed to use a differnt variable `pbs_rtime` so that the benchmarks dont get disturbed for PBS.
 ### Bonus
 * For the bonus, I modified the clock interrupt to print the output of procdump after each tick.
-* Now, I piped the output of the make command into the tee commmand in order to store the procdump info into the file.
-* Now, I parsed this raw data using python(code in `Graphs/graph_plot.py`), and plotted it using myplotlib.
+* Now, I piped the output of the make command into the `tee` commmand in order to store the procdump info into the file.
+* Now, I parsed this raw data using python as well as manually cleaned it, and plotted it using myplotlib(code in `Graphs/graph_plot.py`).
 
 ## Answer to Specification 2 MLFQ question
 This scheduler algorithm can be exploited by a process by doing redundant I/O just before its allotted timeslice(equal to 2^(queue_no) ticks) gets over. Now, when it is goes out of the queueuing system and comes back, its run time for that queue would again be set to 0 when it is pushed to the back of the queue. Thus, it can forever continue to remain in a high priority queue, and this is achieved by spoofing the CPU into thinking that it is an I/O bound or interactive process that needs higher priority, while in reality it could be a CPU bound process. Thus, despite not being I/O bound process, it can continue getting more priority and remain in a high priority queue.
@@ -91,6 +90,29 @@ I tabulate the outputs of the `schedulertest` code given:
 | PBS            | 480          | 30            |
 | MLFQ           | 468          | 30            |
 ### Performance comparison
-In case 1, as expected, the average run time is almost the same for all schedulers, since the time taken for a process to run(i.e. remain in the RUNNING state) is inherently a property of the process rather than the property of the scheduler. FCFS has slightly higher runtime, while MLFQ has slightly lesser runtime.  
+In case 1, as expected, the average run time is almost the same for all schedulers, since the time taken for a process to run(i.e. remain in the RUNNING state) is inherently a property of the process rather than the property of the scheduler. At the same time, preemption causes some amount of increase in the runtimes. FCFS has slightly higher runtime, while MLFQ has slightly lesser runtime.
+This suggests that the number of times processes get preempted is lesser in case of MLFQ as compared to other schedulers like RR and PBS, where preemption occurs on each clock interrupt(while in MLFQ occurs based upon queue number).
+Further, the I/O heavy processes might have caused higher run time in FCFS, since they might continuously be changing their states between sleeping and runnable, causing them to get preempted quickly after being selected on the basis of ctime.
+FCFS also has a higher waiting time for the same reason, as it is increased mainly by I/O heavy processes continuously changing their state between sleeping and runnable. This causes the CPU heavy processes to wait for longer comparatively. RR, PBS and MLFQ on the other hand don't keep coming back to the same I/O heavy proc when it is(briefly) runnable instead of sleeping as often.
 
-Now, if we compare the two sets of 
+Further, we can see the effects of no preemption in FCFS with 15 processes, as the average run time is lesser compared to other schedulers. Further, since the majority waiting must have happened from waiting for the I/O heavy processes(which remain the same), there isn't much increase in its wait time(rather, it has decreased). Wait time in other schedulers have increased, however. This is possibly because here, the wait time is more closely related to the number of processes than it is in case of FCFS. Here again, MLFQ has lesser average run time.
+
+While we might have expected much better performance from MLFQ, it seems that due to the overheads of managing queue-wise process and their timers, its performance isn't as good as it should have been. It is possible that MLFQ's relative performance would have been much better in case of large number of processes getting executed.
+
+### BONUS
+I obtained the following graph with the given benchmark code, with the MAX_AGE_LIMIT kept as 30 ticks:
+![MLFQ-Graph](./Graphs/Graph-1/Figure_1.png)
+The code that I used to generate this graph can be found in `./Graphs/` directory.
+Some observations:
+* Initially, all the runnable(non-sleeping) processes start in the 0th queue, and then after exceeding the ticks, move to 1st queue and so on.
+* The sleeping processes, which were inserted in the 0th queue, remain there until the end when they quickly exit the queue after finishing.
+* The preemption and moving into lower priority queues continues until 3rd queue, where in the duration that P9, 10, 11, 12 run, P13 gets starved and is moved to the higher priority queue(queue 2), where it is executed and then it returns into queue 3.
+* Again in queue 3, P13 is the only process(as others had moved to queue 4), and thus it again gets executed, and moves to queue 4.
+* By this time, P9 had gotten starved, and so it moved to the higher priority queue(queue 3), where it again gets executed. Smilarly, by the time P9 completes execution, P9 gets starved and goes into queue 3 and runs there. Same for P10, and thus, the processes from here on keep starving and coming down to queue 3, and after executing, the next process which had starved enters queue 3 to be executed.
+* Thus, minimal execution happens around this point in queue 4, as all the processes get starved and move to queue 3 to get executed.
+
+I also generated another graph where some processes ran, then slept and then ran again. The complete graph is:
+![MLFQ-Graph](./Graphs/Graph-2/complete_plot.png)
+The graph for the first 400 ticks is:
+![MLFQ-Graph](./Graphs/Graph-2/plot_400_ticks.png)
+Similar observations can be seen here, along with the fact that some processes remain stuck in certain queues that they reached after running when they start to sleep. For example, the very long P14 line, as well as the long wait of P9 are due to the same reasons. Similar kind of exchange between 3rd and 4th queue, and 2nd and 3rd queue can be seen here(this had lesse AGEING limit).
