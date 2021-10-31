@@ -37,7 +37,8 @@ I did the work of this assignment on top of the repo that was shared in the tuto
 ### PBS Scheduler
 * For this scheduler, I added the variables of `static_priority`, `niceness`, `stime` for calculating the dynamic priorities.
 * Then, I added the syscall `set_priority` syscall, along with the `setpriority` user program(in `users/setpriority.c`) to change the priority to a specific value.
-    * This also resets the niceness to 5, and also sets the runtime and sleeptime values to 0.
+    * This also resets the niceness to 5, and also sets the pbs_runtime and sleeptime values to 0.
+    * I used a different variable `pbs_rtime` instead of `rtime` for niceness computations, since this is set to 0 in `set_priority`, which would mess up benchmark values. 
     * This might lead to wrong values in `procdump`, but since this was allowed through a Moodle query, I have implemented this.
     * Further, after the syscall, if the new dynamic priority(==static priority) is lesser than the previous dynamic priority(used during scheduling), then the process is yielded and rescheduling takes place.
 * The value of niceness is changed only after the scheduled process completes its run.
@@ -63,7 +64,7 @@ I did the work of this assignment on top of the repo that was shared in the tuto
 * Note that for Zombie processes, the priority is printed as -1 in MLFQ.
 * Note that the `q_i` values in procdump denote the total time for which the process remained in that particular queue(as a RUNNING/RUNNABLE/SLEEPING) process.
 * Note that the queue wait time is taken to be the time that the process spends in the RUNNABLE state in that queue. This was because it made sense since the SLEEPING procsses aren't considered to exactly be a part of the queue as per the assignment PDF.
-* Note that after running `set_priority()` in PBS, the values of rtime and wtime may become weird, since they are supposed to be reset when `set_priority()` is run. Since this was a requirement of the assignment, this has been considered acceptable.
+* Note that after running `set_priority()` in PBS, the values of rtime and wtime may become weird, since they are supposed to be reset when `set_priority()` is run. To avoid this, I changed to use a differnt variable `pbs_rtime` so that the benchmarks dont get disturbed for PBS.
 ### Bonus
 * For the bonus, I modified the clock interrupt to print the output of procdump after each tick.
 * Now, I piped the output of the make command into the tee commmand in order to store the procdump info into the file.
