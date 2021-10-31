@@ -75,7 +75,7 @@ This scheduler algorithm can be exploited by a process by doing redundant I/O ju
 
 ## Benchmark program performance
 I tabulate the outputs of the `schedulertest` code given:
-### For a single CPU:
+### 10 PROCS CREATED(5 I/O and 5 CPU heavy):
 | Scheduler type | Avg Run time | Avg Wait time |
 |----------------|--------------|---------------|
 | Round Robin    | 183          | 21            |
@@ -83,13 +83,14 @@ I tabulate the outputs of the `schedulertest` code given:
 | PBS            | 182          | 20            |
 | MLFQ           | 167          | 20            |
 
-### For 3 CPUs:
-| Scheduler type | Avg Run time | Avg Wait time             |
-|----------------|--------------|---------------------------|
-| Round Robin    | 121          | 20                        |
-| FCFS           | 69           | 59                        |
-| PBS            | 130          | 18                        |
-| MLFQ           | -            | -(Only tested on 1 CPU)   |
-
+### 20 PROCS CREATED(5 I/O and 15 CPU heavy)
+| Scheduler type | Avg Run time | Avg Wait time |
+|----------------|--------------|---------------|
+| Round Robin    | 477          | 30            |
+| FCFS           | 383          | 40            |
+| PBS            | 480          | 30            |
+| MLFQ           | 468          | 30            |
 ### Performance comparison
+In case 1, as expected, the average run time is almost the same for all schedulers, since the time taken for a process to run(i.e. remain in the RUNNING state) is inherently a property of the process rather than the property of the scheduler. FCFS has slightly higher runtime, while MLFQ has slightly lesser runtime.  
 
+Now, if we compare the two sets of 

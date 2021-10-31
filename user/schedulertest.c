@@ -4,7 +4,7 @@
 #include "kernel/fcntl.h"
 
 
-#define NFORK 10
+#define NFORK 20
 #define IO 5
 
 int main() {
