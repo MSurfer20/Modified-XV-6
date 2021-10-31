@@ -790,15 +790,17 @@ scheduler(void)
 
     for(int x=1;x<NUM_OF_QUEUES;x++)
     {
-      int queue_size=mlfq_queue[x].num_procs;
-      for(int y=0;y<queue_size;y++)
+      // int queue_size=mlfq_queue[x].num_procs;
+      for(int y=0;y<mlfq_queue[x].num_procs;y++)
       {
         struct proc* ageing_proc;
         ageing_proc=mlfq_queue[x].arr[y];
         if(ageing_proc->qwtime>MAX_OLD_AGE && x>0)
         {
+          // printf("AGEEEEEEEEEEEEEEEE");
           remove_from_mlfq(x, y);
           add_into_mlfq(x-1, ageing_proc);
+          y--;
         }
       }
     }
@@ -1130,7 +1132,7 @@ set_priority(int static_priority, int pid)
       release(&p->lock);
       if(static_priority<old_dynamic_priority)
         {
-          printf("RESCHEDUYLEEEEEEEEEEEEEEEEE");
+          // printf("RESCHEDUYLEEEEEEEEEEEEEEEEE");
           yield();
         }
       return old_static_priority;
