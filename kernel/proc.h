@@ -114,6 +114,7 @@ struct proc {
   int trace_mask;
   int static_priority;
   int niceness;
+  uint pbs_rtime;
 
 
   int scheduled_count;

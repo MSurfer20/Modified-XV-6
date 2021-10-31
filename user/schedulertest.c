@@ -18,9 +18,7 @@ int main() {
       if (pid == 0) {
 #if SCHEDULER!=1
           if (n < IO) {
-            for (volatile int i = 0; i < 1000; i++) {} // CPU bound process 
             sleep(50); // IO bound processes
-            for (volatile int i = 0; i < 1000000000; i++) {} // CPU bound process 
           } else {
 #endif
             for (volatile int i = 0; i < 1000000000; i++) {} // CPU bound process 
@@ -36,10 +34,13 @@ int main() {
       }
   }
 //   PBS TESTING
-//   set_priority(30, 12);
-//   set_priority(5, 13);
-//   set_priority(23, 11);
-//   printf("YAYYYYYY");
+  // for (volatile int i = 0; i < 100; i++) {} // CPU bound process 
+  // set_priority(30, 12);
+  // for (volatile int i = 0; i < 100; i++) {} // CPU bound process 
+  // set_priority(5, 13);
+  // for (volatile int i = 0; i < 10000000; i++) {} // CPU bound process 
+  // set_priority(23, 11);
+  // printf("YAYYYYYY");
 
 // MLFQ Testing
 //   for(volatile int x=0; x<10000000;x++){}

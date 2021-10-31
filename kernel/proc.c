@@ -136,6 +136,7 @@ found:
   p->trace_mask = 0;
   p->ctime=ticks;
   p->rtime=0;
+  p->pbs_rtime=0;
   p->stime=0;
   p->etime=0;
   p->niceness=5;
@@ -539,6 +540,7 @@ update_time()
     acquire(&p->lock);
     if (p->state == RUNNING) {
       p->rtime++;
+      p->pbs_rtime++;
     }
     else if(p->state == SLEEPING)
     {
@@ -759,9 +761,9 @@ scheduler(void)
       swtch(&c->context, &highest_priority_proc->context);
 
       c->proc = 0;
-      if((highest_priority_proc->stime)+(highest_priority_proc->rtime) > 0)
+      if((highest_priority_proc->stime)+(highest_priority_proc->pbs_rtime) > 0)
       {
-        int sum_of_val=(highest_priority_proc->stime)+(highest_priority_proc->rtime);
+        int sum_of_val=(highest_priority_proc->stime)+(highest_priority_proc->pbs_rtime);
         int sleep_time=highest_priority_proc->stime;
         sleep_time=10*sleep_time;
         if(sum_of_val != 0)
@@ -1124,10 +1126,13 @@ set_priority(int static_priority, int pid)
       p->static_priority=static_priority;
       p->niceness=5;
       p->stime=0;
-      p->rtime=0;
+      p->pbs_rtime=0;
       release(&p->lock);
       if(static_priority<old_dynamic_priority)
-        yield();
+        {
+          printf("RESCHEDUYLEEEEEEEEEEEEEEEEE");
+          yield();
+        }
       return old_static_priority;
     }
     release(&p->lock);
