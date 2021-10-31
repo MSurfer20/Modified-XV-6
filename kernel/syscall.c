@@ -197,7 +197,7 @@ syscall(void)
       {
       printf("%d %d)", arg1, arg2); 
       }
-      else if(num==SYS_read || num==SYS_write || num==SYS_mknod)
+      else if(num==SYS_read || num==SYS_write || num==SYS_mknod || num==SYS_waitx)
       {
       printf("%d %d %d)", arg1, arg2, arg3); 
       }
