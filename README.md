@@ -74,33 +74,37 @@ This scheduler algorithm can be exploited by a process by doing redundant I/O ju
 
 ## Benchmark program performance
 I tabulate the outputs of the `schedulertest` code given:
-### 10 PROCS CREATED(5 I/O and 5 CPU heavy):
-| Scheduler type | Avg Run time | Avg Wait time |
-|----------------|--------------|---------------|
-| Round Robin    | 183          | 21            |
-| FCFS           | 195          | 43            |
-| PBS            | 182          | 20            |
-| MLFQ           | 167          | 20            |
+### 10 PROCS CREATED(5 I/O and 5 CPU heavy)[10 CPU heavy in case of FCFS]:
+| Scheduler type | Avg Wait time | Avg Run time  |
+|----------------|-------------- |---------------|
+| Round Robin    | 183           | 21            |
+| FCFS           | 195           | 43            |
+| PBS            | 182           | 20            |
+| MLFQ           | 167           | 20            |
 
-### 20 PROCS CREATED(5 I/O and 15 CPU heavy)
-| Scheduler type | Avg Run time | Avg Wait time |
-|----------------|--------------|---------------|
-| Round Robin    | 477          | 30            |
-| FCFS           | 383          | 40            |
-| PBS            | 480          | 30            |
-| MLFQ           | 468          | 30            |
+### 20 PROCS CREATED(10 I/O and 10 CPU heavy)[20 CPU heavu in case of FCFS]
+| Scheduler type | Avg Wait time | Avg Run time  |
+|----------------|-------------- |---------------|
+| Round Robin    | 282           | 20            |
+| FCFS           | 385           | 41            |
+| PBS            | 294           | 21            |
+| MLFQ           | 278           | 20            |
 ### Performance comparison
-In case 1, as expected, the average run time is almost the same for all schedulers, since the time taken for a process to run(i.e. remain in the RUNNING state) is inherently a property of the process rather than the property of the scheduler. At the same time, preemption causes some amount of increase in the runtimes. FCFS has slightly higher runtime, while MLFQ has slightly lesser runtime.
-This suggests that the number of times processes get preempted is lesser in case of MLFQ as compared to other schedulers like RR and PBS, where preemption occurs on each clock interrupt(while in MLFQ occurs based upon queue number).
-Further, the I/O heavy processes might have caused higher run time in FCFS, since they might continuously be changing their states between sleeping and runnable, causing them to get preempted quickly after being selected on the basis of ctime.
-FCFS also has a higher waiting time for the same reason, as it is increased mainly by I/O heavy processes continuously changing their state between sleeping and runnable. This causes the CPU heavy processes to wait for longer comparatively. RR, PBS and MLFQ on the other hand don't keep coming back to the same I/O heavy proc when it is(briefly) runnable instead of sleeping as often.
+In case of 10 processes:
+* The average wait time of MLFQ is much better as compared to the default Round Robin. This is because the the processes that wait for too long get CPU through the facility of ageing. This causes wait times to never exceed a certain threshold.
+* The average wait time of FCFS is much worse than that of Round Robin and other schedulers. This is because FCFS keeps execution one process for a much longer time, and this leads to much higher wait times. Thus, the non-preemptive nature of FCFS causes such high times. Also, the testing runs 10 CPU heavy processes for FCFS, rather than 5 I/O heavy and 5 CPU heavy in case of other schedulers. This explains the double run time(since twice the number of CPU bound processes run, which have significant run time as compared to the ~0 runtime of the I/O heavy processes).
+* The average wait time of PBS is almost same as RR. The little improvement is because of better scheduling through niceness getting updated with sleeptime and runtime considerations. However, this improvement is rather small in terms of 10 processes(and doubles when the number of processes is doubled).
+* The little increase in average run time in case of RR might be explained by more preemption happening, which increases the run time by a very small bit.
+* The almost same run times in all the processes(even FCFS, since 5 CPU heavy processes would have taken same amount of runtime), shows that the runtime is most dependent upon the structure of the process itself rather than the scheduler that runs it.
+* Due to high frequency of preemption in case of Round robin and MLFQ, they have better wait times than the others, and do better scheduling to spread the wait times.
 
-Further, we can see the effects of no preemption in FCFS with 15 processes, as the average run time is lesser compared to other schedulers. Further, since the majority waiting must have happened from waiting for the I/O heavy processes(which remain the same), there isn't much increase in its wait time(rather, it has decreased). Wait time in other schedulers have increased, however. This is possibly because here, the wait time is more closely related to the number of processes than it is in case of FCFS. Here again, MLFQ has lesser average run time.
+In case of 20 processes:
+* The improvements of MLFQ seem lesser in case of 20 processes. This might be explained by more overhead in terms of moving more processes between the queues and checking their parameters and updating them.
+* Despite the overheads, again MLFQ performs the best.
+* As expected, the run time of FCFS is much higher due to it running the CPU heavy processes(which are taking much more run time). The difference is much more pronounced in this case(since more processes means more waiting for each one to finish).
+* The wait time in case of FCFS is much higher than the others. This is in line with the previous observations.
 
-While we might have expected much better performance from MLFQ, it seems that due to the overheads of managing queue-wise process and their timers, its performance isn't as good as it should have been. It is possible that MLFQ's relative performance would have been much better in case of large number of processes getting executed.
-
-**Thus, we can see that MLFQ works better than the default RR, despite the overhead computations that we are doing in it. Also, we can see how FCFS gives lower run times, but suffers heavily in terms of wait times, as it ends up waiting a lot for the I/O bound processes(which keep switching b/w running and sleeping). Thus, while FCFS isn't better than RR due to double waiting time than RR, MLFQ reduces the run time without any compromise in terms of waiting time. Similarly, PBS also has almost same run time and wait time as RR. Finally, we might even see better relative performance of MLFQ when the number of processes is increased by a LOT.**
-An important point to note is that in case of only CPU bound processes, FCFS might give better performance due to saving the preemption time.
+From the above benchmarking, MLFQ seems to be a better scheduler than Round Robin. However, we must note that its scheduling can be exploited by processes that go to sleep simply to stay in high priority queues, even if they are not doing I/O. Thus, CPU heavy processes might spoof I/O activities to maintain high priority.
 
 ### BONUS
 I obtained the following graph with the given benchmark code, with the MAX_AGE_LIMIT kept as 30 ticks:
