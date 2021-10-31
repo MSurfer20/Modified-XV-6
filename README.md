@@ -71,3 +71,7 @@ I did the work of this assignment on top of the repo that was shared in the tuto
 * Now, I parsed this raw data using python(code in `Graphs/graph_plot.py`), and plotted it using myplotlib.
 
 ## Answer to Specification 2 MLFQ question
+This scheduler algorithm can be exploited by a process by doing redundant I/O just before its allotted timeslice(equal to 2^(queue_no) ticks) gets over. Now, when it is goes out of the queueuing system and comes back, its run time for that queue would again be set to 0 when it is pushed to the back of the queue. Thus, it can forever continue to remain in a high priority queue, and this is achieved by spoofing the CPU into thinking that it is an I/O bound or interactive process that needs higher priority, while in reality it could be a CPU bound process. Thus, despite not being I/O bound process, it can continue getting more priority and remain in a high priority queue.
+
+## Benchmark program performance
+I tabulate the outputs of the `schedulertest` code given:
